@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const errorHandler = require("./middleware/errorHandlerMiddleware");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -37,6 +38,8 @@ if (process.env.NODE_ENV === 'development') {
 // app.get("/api/health", (req, res) => {
 //   res.json({ status: "ok", message: "Server is running" });
 // });
+
+app.use("/api/auth", authRoutes);
 
 // 404 Not Found handler
 app.use((req, res, next) => {
