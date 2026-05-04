@@ -17,6 +17,7 @@ const userResponse = (user) => ({
   bio: user.bio,
   followers: user.followers,
   following: user.following,
+  bookmarks: user.bookmarks,
   createdAt: user.createdAt,
 });
 
@@ -159,7 +160,7 @@ exports.logout = async (req, res, next) => {
  * - Get Current User: Retrieve user data for the logged-in user
  */
 
-exports.getMe = async (req, res, next) => {
+exports.getUserDetails = async (req, res, next) => {
   try {
     const user = await userModel.findById(req.user.id);
     res.status(200).json({ status: "success", user: userResponse(user) });
@@ -187,7 +188,7 @@ exports.updateAvatar = async (req, res, next) => {
     const { url, fileId } = await uploadToImageKit(
       req.file.buffer,
       `avatar-${user._id}`,
-      "/avatars",
+      "SpellOutCode/avatars",
     );
 
     user.avatar = { url, fileId };

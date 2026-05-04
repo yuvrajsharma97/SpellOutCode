@@ -11,19 +11,33 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 app.use(helmet());
-app.use(mongoSanitize());
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
+
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100,
-    message: 'Too many requests from this IP, please try again later.'
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
 });
-app.use('/api',limiter);
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true}));
+app.use("/api", limiter);
+
+app.use(express.json({ limit: "10kb" }));
+
+app.use(express.urlencoded({ extended: true }));
+
+/**
+ app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  }),
+);
+*/
+
 app.use(cookieParser());
 
 if (process.env.NODE_ENV === 'development') {

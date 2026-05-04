@@ -6,7 +6,7 @@ const {
   login,
   refreshToken,
   logout,
-  getMe,
+  getUserDetails,
   updateAvatar,
   updateProfile,
 } = require("../controllers/authController");
@@ -23,7 +23,7 @@ router.post("/refresh-token", refreshToken);
 router.use(protect); 
 
 router.post("/logout", logout);
-router.get("/me", getMe);
+router.get("/get-user", getUserDetails);
 router.patch("/update-profile", updateProfile);
 router.patch("/update-avatar", upload.single("avatar"), updateAvatar);
 
