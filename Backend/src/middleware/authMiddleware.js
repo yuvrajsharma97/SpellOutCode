@@ -1,28 +1,45 @@
-const jwt = require("jsonwebtoken");
-const UserModel = require("../models/User");
-const AppError = require("../utils/appError");
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import AppError from "../utils/appError.js";
 
 const protect = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return next(new AppError("You are not logged in.", 401));
+    const token = req.cookies?.accessToken;
+
+    if (!token) {
+      return next(new AppError("Not authenticated. Please log in.", 401));
     }
 
-    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const currentUser = await User.findById(decoded.id).select(
+      "+passwordChangedAt",
+    );
 
-    const user = await UserModel.findById(decoded.id);
-    if (!user) {
+    if (!currentUser) {
       return next(new AppError("User no longer exists.", 401));
     }
 
-    req.user = user;
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError(
+          "Password was recently changed. Please log in again.",
+          401,
+        ),
+      );
+    }
+
+    req.user = { id: currentUser._id };
+
     next();
   } catch (error) {
-    next(error);
+    if (error.name === "TokenExpiredError") {
+      return next(
+        new AppError("Session expired. Please refresh your token.", 401),
+      );
+    }
+    return next(new AppError("Invalid token. Please log in again.", 401));
   }
 };
 
-module.exports = protect;
+export default protect;

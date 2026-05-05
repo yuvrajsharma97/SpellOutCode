@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const errorHandler = require("./middleware/errorHandlerMiddleware");
 const authRoutes = require("./routes/authRoutes");
+const AppError = require('./utils/appError');
 
 const app = express();
 
@@ -50,7 +51,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Test route
 // app.get("/api/health", (req, res) => {
-//   res.json({ status: "ok", message: "Server is running" });
+//   res.json({ status: "success", message: "Server is running" });
 // });
 
 app.use("/api/auth", authRoutes);

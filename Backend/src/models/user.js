@@ -1,6 +1,15 @@
-// models/User.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+
+const socialLinksSchema = new mongoose.Schema(
+  {
+    github: { type: String, default: "" },
+    linkedin: { type: String, default: "" },
+    twitter: { type: String, default: "" },
+    website: { type: String, default: "" },
+  },
+  { _id: false },
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,8 +17,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required"],
       trim: true,
-      minlength: [2, "Name must be at least 2 characters"],
-      maxlength: [50, "Name cannot exceed 50 characters"],
+      maxlength: [60, "Name cannot exceed 60 characters"],
+    },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [
+        /^[a-z0-9_]{3,30}$/,
+        "Username must be 3–30 characters: lowercase letters, numbers, or underscores only",
+      ],
     },
     email: {
       type: String,
@@ -25,38 +44,40 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters"],
       select: false,
     },
+    passwordChangedAt: {
+      type: Date,
+      select: false,
+    },
     avatar: {
       url: { type: String, default: "" },
       fileId: { type: String, default: "" },
     },
     bio: {
       type: String,
-      maxlength: [200, "Bio cannot exceed 200 characters"],
       default: "",
+      maxlength: [300, "Bio cannot exceed 300 characters"],
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    roleTitle: {
+      type: String,
+      default: "",
+      maxlength: [80, "Role title cannot exceed 80 characters"],
+    },
+    socialLinks: {
+      type: socialLinksSchema,
+      default: () => ({}),
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
     refreshToken: {
       type: String,
+      default: null,
       select: false,
     },
-    passwordResetToken: { type: String, select: false },
-    passwordResetExpires: { type: Date, select: false },
   },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
+  { timestamps: true },
 );
-
-
-userSchema.virtual("posts", {
-  ref: "Post",
-  foreignField: "author",
-  localField: "_id",
-});
 
 
 userSchema.pre("save", async function (next) {
@@ -78,5 +99,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-const userModel = mongoose.model("User", userSchema);
-module.exports = userModel;
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
