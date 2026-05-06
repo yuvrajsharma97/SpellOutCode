@@ -4,27 +4,15 @@ const router = express.Router();
 const {
   register,
   login,
-  refreshToken,
   logout,
-  getUserDetails,
-  updateAvatar,
-  updateProfile,
+  refresh,
 } = require("../controllers/authController");
 
 const protect = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware");
-
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/refresh-token", refreshToken);
-
-// All routes below this line require authentication
-router.use(protect); 
-
-router.post("/logout", logout);
-router.get("/get-user", getUserDetails);
-router.patch("/update-profile", updateProfile);
-router.patch("/update-avatar", upload.single("avatar"), updateAvatar);
+router.post("/logout", protect, logout);
+router.post("/refresh", refresh);
 
 module.exports = router;

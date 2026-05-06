@@ -7,7 +7,7 @@ const {
 
 
 /**
- * Register a new user, issue tokens, and return user data.
+ * Register a new user.
  */
 
 const registerUser = async ({ name, username, email, password }) => {
@@ -26,7 +26,7 @@ const registerUser = async ({ name, username, email, password }) => {
 };
 
 /**
- * Login user by validating credentials, issuing tokens, and returning user data.
+ * Login user by validating credentials.
  */
 
 const loginUser = async ({ email, password }) => {
@@ -59,7 +59,7 @@ const logoutUser = async (userId) => {
 
 
 /** 
- * Rotate refresh token: validate incoming token, issue new tokens, and return user data.
+ * Rotate refresh token: validate incoming token and issue new tokens.
  */
 
 const rotateRefreshToken = async (incomingRefreshToken) => {

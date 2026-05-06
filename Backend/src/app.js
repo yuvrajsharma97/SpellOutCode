@@ -23,7 +23,12 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests. Please try again later.",
+  },
 });
 app.use("/api", limiter);
 
@@ -51,7 +56,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Test route
 // app.get("/api/health", (req, res) => {
-//   res.json({ status: "success", message: "Server is running" });
+//   res.json({ success: true, message: "Server is running" });
 // });
 
 app.use("/api/auth", authRoutes);

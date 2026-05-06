@@ -1,51 +1,52 @@
 const AppError = require("../utils/appError");
 
-const handleCastError = (err) => {
-  const message = `Invalid ${err.path}: ${err.value}`;
-  return new AppError(message, 400);
-};
+const handleCastError = (err) => new AppError(`Invalid ${err.path}`, 400);
 
 const handleDuplicateFields = (err) => {
   const field = Object.keys(err.keyValue)[0];
-  const message = `${field} already exists. Please use a different value.`;
-  return new AppError(message, 400);
+  return new AppError(`${field} already exists`, 400);
 };
 
 const handleValidationError = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
-  const message = `Invalid input: ${errors.join(". ")}`;
-  return new AppError(message, 400);
+
+  return new AppError(errors.join(", "), 400);
 };
 
 const handleJWTExpired = () =>
-  new AppError("Your session has expired. Please log in again.", 401);
+  new AppError("Session expired. Please log in again.", 401);
 
 const handleJWTInvalid = () =>
-  new AppError("Invalid token. Please log in again.", 401);
+  new AppError("Invalid authentication token.", 401);
 
 const errorHandler = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || "error";
+  let error = err;
 
-  let error = { ...err, message: err.message };
+  if (err.name === "CastError") error = handleCastError(err);
+  if (err.code === 11000) error = handleDuplicateFields(err);
+  if (err.name === "ValidationError") error = handleValidationError(err);
+  if (err.name === "TokenExpiredError") error = handleJWTExpired();
+  if (err.name === "JsonWebTokenError") error = handleJWTInvalid();
 
-  if (error.name === "CastError") error = handleCastError(error);
-  if (error.code === 11000) error = handleDuplicateFields(error);
-  if (error.name === "ValidationError") error = handleValidationError(error);
-  if (error.name === "TokenExpiredError") error = handleJWTExpired();
-  if (error.name === "JsonWebTokenError") error = handleJWTInvalid();
+  const statusCode = error.statusCode || 500;
+
+  if (process.env.NODE_ENV === "development") {
+    console.error(error);
+  }
 
   if (error.isOperational) {
-    return res.status(error.statusCode).json({
-      status: error.status,
+    return res.status(statusCode).json({
+      success: false,
       message: error.message,
+      ...(process.env.NODE_ENV === "development" && {
+        stack: error.stack,
+      }),
     });
   }
 
-  console.error("UNEXPECTED ERROR:", err);
   return res.status(500).json({
-    status: "error",
-    message: "Something went wrong. Please try again later.",
+    success: false,
+    message: "Something went wrong",
   });
 };
 

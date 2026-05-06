@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
-import User from "../models/user.js";
-import AppError from "../utils/appError.js";
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const AppError = require("../utils/appError");
 
 const protect = async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ const protect = async (req, res, next) => {
       return next(new AppError("Not authenticated. Please log in.", 401));
     }
 
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const currentUser = await User.findById(decoded.id).select(
       "+passwordChangedAt",
@@ -42,4 +42,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-export default protect;
+module.exports = protect;

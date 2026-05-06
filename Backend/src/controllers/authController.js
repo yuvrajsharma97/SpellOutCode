@@ -1,4 +1,4 @@
-const authService = require("../services/authService");
+const authService = require("../services/authServices");
 const { registerSchema, loginSchema } = require("../validators/authValidator");
 const { setAuthCookies, clearAuthCookies } = require("../utils/cookieHelpers");
 const AppError = require("../utils/appError");
@@ -55,7 +55,11 @@ const login = async (req, res, next) => {
   }
 };
 
-// ── POST /api/auth/logout ─────────────────────────────────────────────────────
+/**
+ * POST /api/auth/logout
+ * Body: none
+ */
+
 const logout = async (req, res, next) => {
   try {
     await authService.logoutUser(req.user.id);
@@ -70,7 +74,10 @@ const logout = async (req, res, next) => {
   }
 };
 
-// ── POST /api/auth/refresh ────────────────────────────────────────────────────
+/**
+ * POST /api/auth/refresh
+ * Body: none
+ */
 const refresh = async (req, res, next) => {
   try {
     const incomingRefreshToken = req.cookies?.refreshToken;
