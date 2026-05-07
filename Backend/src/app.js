@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const errorHandler = require("./middleware/errorHandlerMiddleware");
 const authRoutes = require("./routes/authRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 const AppError = require('./utils/appError');
 
 const app = express();
@@ -60,6 +61,7 @@ if (process.env.NODE_ENV === 'development') {
 // });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
 
 // 404 Not Found handler
 app.use((req, res, next) => {

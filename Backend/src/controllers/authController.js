@@ -12,7 +12,7 @@ const register = async (req, res, next) => {
   try {
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      return next(new AppError(parsed.error.errors[0].message, 400));
+      return next(new AppError(parsed.error.issues[0].message, 400));
     }
 
     const user = await authService.registerUser(parsed.data);
@@ -36,7 +36,7 @@ const login = async (req, res, next) => {
   try {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
-      return next(new AppError(parsed.error.errors[0].message, 400));
+      return next(new AppError(parsed.error.issues[0].message, 400));
     }
 
     const { user, accessToken, refreshToken } = await authService.loginUser(

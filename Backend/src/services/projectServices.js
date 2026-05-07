@@ -39,11 +39,11 @@ const createProject = async (authorId, data) => {
 };
 
 /**
- * Get all projects for a given username.
+ * Get all projects for a given user ID.
  */
 
-const getProjectsByUsername = async (username) => {
-  const user = await User.findOne({ username }).select("_id");
+const getProjectsByUser = async (userId) => {
+  const user = await User.findOne({ _id: userId });
 
   if (!user) {
     throw new AppError("User not found", 404);
@@ -72,7 +72,9 @@ const getProjectBySlug = async (slug) => {
   return project;
 };
 
-// ── Update project ────────────────────────────────────────────────────────────
+/**
+ * Update a project with ownership check and slug regeneration if title changes.
+ */
 const updateProject = async (projectId, userId, data) => {
   const project = await Project.findById(projectId);
 
@@ -99,7 +101,9 @@ const updateProject = async (projectId, userId, data) => {
   return updated;
 };
 
-// ── Delete project ────────────────────────────────────────────────────────────
+/**
+ * Delete a project with ownership check.
+ */
 const deleteProject = async (projectId, userId) => {
   const project = await Project.findById(projectId);
 
@@ -116,7 +120,7 @@ const deleteProject = async (projectId, userId) => {
 
 module.exports = {
   createProject,
-  getProjectsByUsername,
+  getProjectsByUser,
   getProjectBySlug,
   updateProject,
   deleteProject,
