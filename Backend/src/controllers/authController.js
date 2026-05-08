@@ -1,5 +1,6 @@
 const authService = require("../services/authServices");
 const { registerSchema, loginSchema } = require("../validators/authValidator");
+const { forgotPasswordSchema } = require("../validators/contactValidator");
 const { setAuthCookies, clearAuthCookies } = require("../utils/cookieHelpers");
 const AppError = require("../utils/appError");
 
@@ -97,4 +98,46 @@ const refresh = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout, refresh };
+/**
+ * POST /api/auth/forgot-password
+ * Body: { email }
+*/
+const forgotPassword = async (req, res, next) => {
+  try {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return next(new AppError(parsed.error.issues[0].message, 400));
+    }
+
+    await authService.forgotPassword(parsed.data.email);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset instructions sent to your email",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/** 
+ * POST /api/auth/reset-password
+ * Body: { token, newPassword }
+*/
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    await authService.resetPassword(token, newPassword);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, logout, refresh, forgotPassword, resetPassword };

@@ -1,9 +1,12 @@
 const User = require("../models/user");
 const AppError = require("../utils/appError");
+const crypto = require("crypto");
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/generateTokens");
+
+const { sendPasswordResetEmail } = require("./contactServices");
 
 
 /**
@@ -88,6 +91,54 @@ const rotateRefreshToken = async (incomingRefreshToken) => {
   };
 };
 
+/**
+ * Forgot Password: Generate reset token and send email with instructions.
+ */
+
+const forgotPassword = async (email) => {
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError(
+      "If an account exists, a reset link has been sent. Please check your email.",
+      404,
+    );
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+  await sendPasswordResetEmail(user.email, user.name, resetURL);
+
+  return;
+};
+
+/**
+ * Reset Password: Validate token, update password, and clear reset token fields.
+*/
+
+const resetPassword = async (resetToken, newPassword) => {
+  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+  const user = await User.findOne({ 
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  }).select("+password");
+
+  if (!user) {
+    throw new AppError("Invalid or expired reset token, Please try again", 400);
+  }
+
+  user.password = newPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  return;
+};
 
 const sanitizeUser = (user) => ({
   _id: user._id,
@@ -106,4 +157,6 @@ module.exports = {
   loginUser,
   logoutUser,
   rotateRefreshToken,
+  forgotPassword,
+  resetPassword
 };

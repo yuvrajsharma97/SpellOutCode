@@ -18,7 +18,7 @@ router.use(protect);
 
 // Protected routes 
 router.post("/create-new-project", createProject);
-router.patch("/:id", updateProject);
-router.delete("/:id", deleteProject);
+router.patch("/update/:id", updateProject);
+router.delete("/delete/:id", deleteProject);
 
 module.exports = router;
