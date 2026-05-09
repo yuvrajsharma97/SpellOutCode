@@ -1,6 +1,6 @@
 const sendEmail = require("../utils/sendEmail");
 
-const regestrationSuccessEmailTemplate = (userEmail, name) => {
+const regestrationSuccessEmailTemplate = async(userEmail, name) => {
     const subject = "Welcome to Spell Out Code!";
 
     const text = `Welcome to Spell Out Code, ${name}! 

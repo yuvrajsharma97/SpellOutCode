@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const updateRoutes = require("./routes/updateRoutes");
 const profileRoutes = require("./routes/profileRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 const AppError = require('./utils/appError');
 
 const app = express();
@@ -66,6 +67,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/updates", updateRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/contact", contactRoutes);
 
 // 404 Not Found handler
 app.use((req, res, next) => {

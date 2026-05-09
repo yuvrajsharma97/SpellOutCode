@@ -6,7 +6,10 @@ const {
   generateRefreshToken,
 } = require("../utils/generateTokens");
 
-const { sendPasswordResetEmail } = require("./contactServices");
+const {
+  sendPasswordResetEmail,
+  regestrationSuccessEmailTemplate,
+} = require("./contactServices");
 
 
 /**
@@ -24,6 +27,9 @@ const registerUser = async ({ name, username, email, password }) => {
   }
 
   const user = await User.create({ name, username, email, password });
+
+  // Send registration success email
+  await regestrationSuccessEmailTemplate(user.email, user.name);
 
   return sanitizeUser(user);
 };
