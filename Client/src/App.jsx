@@ -1,6 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "../src/context/AuthContext";
-import { ToastProvider } from "../src/context/ToastContext";
+import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import AppRoutes from "./routes/AppRoutes";
 
 export default function App() {

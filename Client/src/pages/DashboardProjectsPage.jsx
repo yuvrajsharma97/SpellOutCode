@@ -17,7 +17,7 @@ import { formatRelativeDate } from "../utils/dates";
 import PageHeader from "../components/layout/PageHeader";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
-import ConfirmationDialog from "..Button/components/ui/ConfirmationDialog";
+import ConfirmationDialog from "../components/ui/ConfirmationDialog";
 import FormField, {
   TextInput,
   TextArea,

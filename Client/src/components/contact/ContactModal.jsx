@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { contactApi } from "../api/contact";
-import { contactSchema } from "../schemas";
-import { useToast } from "../context/ToastContext";
-import Modal from "../components/ui/Modal";
-import FormField, { TextInput, TextArea } from "../components/ui/FormField";
-import Button from "../components/ui/Button";
+import { contactApi } from "../../api/contact";
+import { contactSchema } from "../../schemas";
+import { useToast } from "../../context/ToastContext";
+import Modal from "../ui/Modal";
+import FormField, { TextInput, TextArea } from "../ui/FormField";
+import Button from "../ui/Button";
 
 export default function ContactModal({
   isOpen,

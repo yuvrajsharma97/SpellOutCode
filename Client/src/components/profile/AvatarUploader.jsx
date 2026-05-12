@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { Upload, X } from "lucide-react";
-import { profilesApi } from "../api/profiles";
-import { useToast } from "../context/ToastContext";
-import { useAuth } from "../context/AuthContext";
+import { profilesApi } from "../../api/profiles";
+import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../context/AuthContext";
 import { initials } from "../../utils/strings";
 
 export default function AvatarUploader() {

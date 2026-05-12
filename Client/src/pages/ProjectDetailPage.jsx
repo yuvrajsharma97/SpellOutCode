@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { usePublicProject } from "../hooks/useProjects";
 import { usePublicUpdates } from "../hooks/useUpdates";
 import StatusBadge from "../components/ui/StatusBadge";
@@ -139,7 +139,7 @@ export default function ProjectDetailPage() {
               {updates.length} {updates.length === 1 ? "update" : "updates"}
             </span>
 
-            {project.githubUrl && (
+            {/* {project.githubUrl && (
               <a
                 href={project.githubUrl}
                 target="_blank"
@@ -159,7 +159,7 @@ export default function ProjectDetailPage() {
                 <Github size={12} />
                 GitHub
               </a>
-            )}
+            )} */}
 
             {project.liveUrl && (
               <a

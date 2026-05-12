@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect } from "react";
-import EditorToolbar from "../../components/editor/EditorToolbar";
+import  EditorToolbar  from "../../components/ui/EditorToolbar";
 
 export default function UpdateEditor({
   value,

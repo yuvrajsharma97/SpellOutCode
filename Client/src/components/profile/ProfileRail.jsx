@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { initials } from "../utils/strings";
-import ContactModal from "../components/contact/ContactModal";
+import { initials } from "../../utils/strings";
+import ContactModal from "../contact/ContactModal";
 
 export default function ProfileRail({ profile }) {
   const [contactOpen, setContactOpen] = useState(false);
