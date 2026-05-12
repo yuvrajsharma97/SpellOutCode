@@ -4,22 +4,22 @@ import AuthLayout from "../components/layout/AuthLayout";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import ProtectedRoute from "../routes/ProtectedRoute";
 
-import LandingPage from "@/pages/LandingPage";
-import ProfilePage from "@/pages/ProfilePage";
-import ProjectDetailPage from "@/pages/ProjectDetailPage";
-import UpdateDetailPage from "@/pages/UpdateDetailPage";
+import LandingPage from "../pages/LandingPage";
+import ProfilePage from "../pages/ProfilePage";
+import ProjectDetailPage from "../pages/ProjectDetailPage";
+import UpdateDetailPage from "../pages/UpdateDetailPage";
 
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
-import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 
-import DashboardPage from "@/pages/DashboardPage";
-import DashboardProjectsPage from "@/pages/DashboardProjectsPage";
-import DashboardUpdatesPage from "@/pages/DashboardUpdatesPage";
-import DashboardSettingsPage from "@/pages/DashboardSettingsPage";
+import DashboardPage from "../pages/DashboardPage";
+import DashboardProjectsPage from "../pages/DashboardProjectsPage";
+import DashboardUpdatesPage from "../pages/DashboardUpdatesPage";
+import DashboardSettingsPage from "../pages/DashboardSettingsPage";
 
-import NotFoundPage from "@/pages/NotFoundPage";
+import NotFoundPage from "../pages/NotFoundPage";
 
 export default function AppRoutes() {
   return (

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { updatesApi } from "@/api/updates";
-import { queryKeys } from "@/lib/queryKeys";
+import { updatesApi } from "../api/updates";
+import { queryKeys } from "../lib/queryKeys";
 
 export function usePublicUpdates(username, slug) {
   return useQuery({

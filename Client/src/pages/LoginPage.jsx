@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/context/ToastContext";
-import { loginSchema } from "@/schemas";
-import FormField, { TextInput } from "@/components/ui/FormField";
-import Button from "@/components/ui/Button";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { loginSchema } from "../schemas";
+import FormField, { TextInput } from "../components/ui/FormField";
+import Button from "../components/ui/Button";
 
 export default function LoginPage() {
   const { login } = useAuth();

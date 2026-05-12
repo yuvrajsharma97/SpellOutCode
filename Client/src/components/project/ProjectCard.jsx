@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import StatusBadge from "../ui/StatusBadge"
-import { formatRelativeDate } from "@/utils/dates";
+import { formatRelativeDate } from "../../utils/dates";
 
 export default function ProjectCard({ project, username }) {
   return (

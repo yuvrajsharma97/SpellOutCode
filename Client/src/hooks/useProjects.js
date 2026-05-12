@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { projectsApi } from "@/api/projects";
-import { queryKeys } from "@/lib/queryKeys";
+import { projectsApi } from "../api/projects";
+import { queryKeys } from "../lib/queryKeys";
 
 export function usePublicProjects(username) {
   return useQuery({

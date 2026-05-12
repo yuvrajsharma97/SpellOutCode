@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatDate } from "@/utils/dates";
+import { formatDate } from "../../utils/dates";
 
 export default function UpdateTimeline({ updates, username, projectSlug }) {
   if (!updates?.length) return null;
