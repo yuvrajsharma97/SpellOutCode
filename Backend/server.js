@@ -4,25 +4,40 @@ const connectDB = require("./src/config/db");
 
 const PORT = process.env.PORT || 3000;
 
+let server;
+
 const startServer = async () => {
-  await connectDB();
+  try {
+    await connectDB();
 
-  app.listen(PORT, () => {
-    console.log(
-      `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
-    );
-  });
+    server = app.listen(PORT, () => {
+      console.log(
+        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+      );
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
 
-  const gracefulShutdown = (signal) => {
-    console.log(`${signal} received. Shutting down gracefully...`);
+const shutdownServer = (signal) => {
+  console.log(`${signal} received. Shutting down gracefully...`);
+
+  if (server) {
     server.close(() => {
-      console.log("HTTP server closed.");
+      console.log("Server closed.");
       process.exit(0);
     });
-  };
 
-  process.on("SIGINT", gracefulShutdown);
-  process.on("SIGTERM", gracefulShutdown);
+    setTimeout(() => {
+      console.error("Forced shutdown after timeout.");
+      process.exit(1);
+    }, 10000);
+  }
 };
+
+process.on("SIGINT", () => shutdownServer("SIGINT"));
+process.on("SIGTERM", () => shutdownServer("SIGTERM"));
 
 startServer();
