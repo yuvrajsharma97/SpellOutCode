@@ -11,6 +11,8 @@ const {
   regestrationSuccessEmailTemplate,
 } = require("./contactServices");
 
+const { setAuthCookies } = require("../utils/cookieHelper");
+
 
 /**
  * Register a new user.
@@ -31,7 +33,17 @@ const registerUser = async ({ name, username, email, password }) => {
   // Send registration success email
   await regestrationSuccessEmailTemplate(user.email, user.name);
 
-  return sanitizeUser(user);
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  setAuthCookies(res, accessToken, refreshToken);
+
+  return {
+    user: sanitizeUser(user)
+  };
 };
 
 /**
@@ -108,7 +120,7 @@ const forgotPassword = async (email) => {
   if (!user) {
     throw new AppError(
       "If an account exists, a reset link has been sent. Please check your email.",
-      404,
+      200,
     );
   }
 

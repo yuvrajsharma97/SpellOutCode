@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
       parsed.data,
     );
 
-    setAuthCookies(res, accessToken, refreshToken);
+    await setAuthCookies(res, accessToken, refreshToken);
 
     res.status(200).json({
       success: true,
@@ -86,7 +86,7 @@ const refresh = async (req, res, next) => {
     const { user, accessToken, refreshToken } =
       await authService.rotateRefreshToken(incomingRefreshToken);
 
-    setAuthCookies(res, accessToken, refreshToken);
+    await setAuthCookies(res, accessToken, refreshToken);
 
     res.status(200).json({
       success: true,
@@ -113,7 +113,8 @@ const forgotPassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Password reset instructions sent to your email",
+      message:
+        "If an account exists, a reset link has been sent. Please check your email.",
     });
   } catch (error) {
     next(error);
