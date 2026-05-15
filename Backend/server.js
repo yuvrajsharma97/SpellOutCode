@@ -6,38 +6,40 @@ const PORT = process.env.PORT || 3000;
 
 let server;
 
-const startServer = async () => {
-  try {
-    await connectDB();
+connectDB();
 
-    server = app.listen(PORT, () => {
-      console.log(
-        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
-      );
-    });
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-};
+// const startServer = async () => {
+//   try {
+//     await connectDB();
 
-const shutdownServer = (signal) => {
-  console.log(`${signal} received. Shutting down gracefully...`);
+//     server = app.listen(PORT, () => {
+//       console.log(
+//         `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+//       );
+//     });
+//   } catch (error) {
+//     console.error("Failed to start server:", error);
+//     process.exit(1);
+//   }
+// };
 
-  if (server) {
-    server.close(() => {
-      console.log("Server closed.");
-      process.exit(0);
-    });
+// const shutdownServer = (signal) => {
+//   console.log(`${signal} received. Shutting down gracefully...`);
 
-    setTimeout(() => {
-      console.error("Forced shutdown after timeout.");
-      process.exit(1);
-    }, 10000);
-  }
-};
+//   if (server) {
+//     server.close(() => {
+//       console.log("Server closed.");
+//       process.exit(0);
+//     });
 
-process.on("SIGINT", () => shutdownServer("SIGINT"));
-process.on("SIGTERM", () => shutdownServer("SIGTERM"));
+//     setTimeout(() => {
+//       console.error("Forced shutdown after timeout.");
+//       process.exit(1);
+//     }, 10000);
+//   }
+// };
 
-startServer();
+// process.on("SIGINT", () => shutdownServer("SIGINT"));
+// process.on("SIGTERM", () => shutdownServer("SIGTERM"));
+
+// startServer();

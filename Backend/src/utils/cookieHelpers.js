@@ -1,6 +1,7 @@
 const BASE_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  // secure: process.env.NODE_ENV === "production",
+  secure: false,
   sameSite: "strict",
 };
 

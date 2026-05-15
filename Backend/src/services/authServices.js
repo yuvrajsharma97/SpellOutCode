@@ -11,8 +11,7 @@ const {
   regestrationSuccessEmailTemplate,
 } = require("./contactServices");
 
-const { setAuthCookies } = require("../utils/cookieHelper");
-
+const { setAuthCookies } = require("../utils/cookieHelpers");
 
 /**
  * Register a new user.
@@ -42,7 +41,7 @@ const registerUser = async ({ name, username, email, password }) => {
   setAuthCookies(res, accessToken, refreshToken);
 
   return {
-    user: sanitizeUser(user)
+    user: sanitizeUser(user),
   };
 };
 
@@ -78,8 +77,7 @@ const logoutUser = async (userId) => {
   await User.findByIdAndUpdate(userId, { refreshToken: null });
 };
 
-
-/** 
+/**
  * Rotate refresh token: validate incoming token and issue new tokens.
  */
 
@@ -114,7 +112,6 @@ const rotateRefreshToken = async (incomingRefreshToken) => {
  */
 
 const forgotPassword = async (email) => {
-
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -127,7 +124,7 @@ const forgotPassword = async (email) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+  const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
   await sendPasswordResetEmail(user.email, user.name, resetURL);
 
@@ -136,14 +133,17 @@ const forgotPassword = async (email) => {
 
 /**
  * Reset Password: Validate token, update password, and clear reset token fields.
-*/
+ */
 
 const resetPassword = async (resetToken, newPassword) => {
-  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-  const user = await User.findOne({ 
+  const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    passwordResetExpires: { $gt: Date.now() },
   }).select("+password");
 
   if (!user) {
@@ -176,5 +176,5 @@ module.exports = {
   logoutUser,
   rotateRefreshToken,
   forgotPassword,
-  resetPassword
+  resetPassword,
 };
