@@ -10,15 +10,10 @@ const protect = require("../middleware/authMiddleware");
 
 const router = Router();
 
-// Non-protected routes 
-router.get("/user/:userId", getProjectsByUser);
-router.get("/slug/:slug", getProjectBySlug);
-
 router.use(protect);
-
-// Protected routes 
-router.post("/create-new-project", createProject);
-router.patch("/update/:id", updateProject);
-router.delete("/delete/:id", deleteProject);
+router.get("/mine", getMyProjects); 
+router.post("/create-new-project", createProject); // was /create-new-project
+router.patch("/:id", updateProject); // was /update/:id
+router.delete("/:id", deleteProject);
 
 module.exports = router;

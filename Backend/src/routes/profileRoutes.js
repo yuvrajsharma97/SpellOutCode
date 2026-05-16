@@ -5,18 +5,17 @@ const {
   updateAvatar,
 } = require("../controllers/profileController");
 const protect  = require("../middleware/authMiddleware");
-console.log("protect TYPE:", typeof protect);
 const upload = require("../middleware/uploadMiddleware");
 
 const router = Router();
 
 // Public Route
-router.get("/getProfile/:userId", getProfile);
+router.get("/:username", getProfile);
 
 router.use(protect);
 
 //Protected  Routes
-router.patch("/updateProfile", updateProfile);
-router.patch("/avatarUpload", upload.single("avatar"), updateAvatar);
+router.patch("/me/updateProfile", updateProfile);  
+router.post("/me/avatar", upload.single("avatar"), updateAvatar);
 
 module.exports = router;

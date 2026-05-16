@@ -2,21 +2,26 @@ const profileService = require("../services/profileServices");
 const { updateProfileSchema } = require("../validators/profileValidator");
 const AppError = require("../utils/appError");
 
-// GET /api/profile/:userId 
-const getProfile = async (req, res, next) => {
-  try {
-    const user = await profileService.getProfileByUserId(req.params.userId);
 
-    res.status(200).json({
-      success: true,
-      data: { user },
-    });
+/**
+ * GET /api/users/:username
+ * Param: username
+ * Note: Public route to fetch user profile by username. Returns basic info and avatar URL, but not sensitive data like email.
+ */
+const getProfile = async (req, res, next) => {
+   try {
+    const user = await profileService.getProfileByUsername(req.params.username);
+    res.status(200).json({ success: true, data: { user } });
   } catch (error) {
     next(error);
   }
 };
 
-// PATCH /api/profile 
+/**
+ * PATCH /api/users/me/updateProfile
+ * Body: { name?, bio?, website? }
+ * Note: All fields are optional, but at least one must be provided
+ */
 const updateProfile = async (req, res, next) => {
   try {
     const parsed = updateProfileSchema.safeParse(req.body);
@@ -41,7 +46,11 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-// PATCH /api/profile/avatarUpload 
+/**
+ * POST /api/users/me/avatar
+ * Form Data: avatar (file)
+ * Note: Uploads a new avatar
+ */
 const updateAvatar = async (req, res, next) => {
 
   try {

@@ -11,8 +11,6 @@ const {
   regestrationSuccessEmailTemplate,
 } = require("./contactServices");
 
-const { setAuthCookies } = require("../utils/cookieHelpers");
-
 /**
  * Register a new user.
  */
@@ -29,19 +27,19 @@ const registerUser = async ({ name, username, email, password }) => {
 
   const user = await User.create({ name, username, email, password });
 
-  // Send registration success email
-  await regestrationSuccessEmailTemplate(user.email, user.name);
-
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
   user.refreshToken = refreshToken;
   await user.save();
 
-  setAuthCookies(res, accessToken, refreshToken);
-
+  // Send registration success email
+  await regestrationSuccessEmailTemplate(user.email, user.name);
+  
   return {
     user: sanitizeUser(user),
+    accessToken,
+    refreshToken,
   };
 };
 
@@ -67,6 +65,18 @@ const loginUser = async ({ email, password }) => {
     accessToken,
     refreshToken,
   };
+};
+
+/**
+ * Get current user details by ID.
+ */
+
+const getMe = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  return sanitizeUser(user);
 };
 
 /**
@@ -158,6 +168,21 @@ const resetPassword = async (resetToken, newPassword) => {
   return;
 };
 
+/**
+ * Change Password: Validate current password and update to new password.
+ */
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await User.findById(userId).select("+password");
+
+  if (!(await user.comparePassword(currentPassword))) {
+    throw new AppError("Current password is incorrect", 401);
+  }
+
+  user.password = newPassword;
+  await user.save();
+  return;
+};
+
 const sanitizeUser = (user) => ({
   _id: user._id,
   name: user.name,
@@ -177,4 +202,6 @@ module.exports = {
   rotateRefreshToken,
   forgotPassword,
   resetPassword,
+  getMe,
+  changePassword  
 };

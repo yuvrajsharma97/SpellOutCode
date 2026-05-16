@@ -66,7 +66,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/updates", updateRoutes);
-app.use("/api/profile", profileRoutes);
+app.use("/api/users", profileRoutes);
 app.use("/api/contact", contactRoutes);
 
 // 404 Not Found handler

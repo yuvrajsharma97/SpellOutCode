@@ -2,18 +2,18 @@ const User = require("../models/user");
 const AppError = require("../utils/appError");
 const imageService = require("./uploadToImageKitService");
 
-// Get public profile by user ID
-const getProfileByUserId = async (userId) => {
-  const user = await User.findById(userId);
-
-  if (!user) {
-    throw new AppError("Profile not found", 404);
-  }
-
+/**
+ * get profile by username (public route) 
+ */
+const getProfileByUsername = async (username) => {
+  const user = await User.findOne({ username }); // ← was findById
+  if (!user) throw new AppError("Profile not found", 404);
   return user;
 };
 
-// ── Update profile text fields ────
+/**
+ * update profile (protected route)
+ */
 const updateProfile = async (userId, data) => {
   const user = await User.findByIdAndUpdate(
     userId,
@@ -28,7 +28,9 @@ const updateProfile = async (userId, data) => {
   return user;
 };
 
-// ── Upload or replace avatar ──────
+/**
+ * update avatar (protected route)
+ */
 const updateAvatar = async (userId, fileBuffer, originalName) => {
   const user = await User.findById(userId);
 
@@ -58,7 +60,7 @@ const updateAvatar = async (userId, fileBuffer, originalName) => {
 };
 
 module.exports = {
-  getProfileByUserId,
+  getProfileByUsername,
   updateProfile,
   updateAvatar,
 };
