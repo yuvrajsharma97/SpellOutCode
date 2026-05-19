@@ -30,6 +30,44 @@ const createProject = async (req, res, next) => {
   }
 };
 
+/**
+ * GET /api/projects/my-projects
+ */
+const getMyProjects = async (req, res, next) => {
+  try {
+    const projects = await projectService.getProjectsByUser(req.user.id);
+    res.status(200).json({ success: true, data: { projects } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/users/:username/projects
+ */
+const getProjectsByUsername = async (req, res, next) => {
+  try {
+    const projects = await projectService.getProjectsByUsername(
+      req.params.username,
+    );
+    res.status(200).json({ success: true, data: { projects } });
+  } catch (error) {     
+    next(error);
+  }
+};
+
+/**
+ * GET /api/users/:username/projects/:slug
+ */
+const getProjectBySlug = async (req, res, next) => {
+  try {
+    const project = await projectService.getProjectBySlug(req.params.slug);
+    res.status(200).json({ success: true, data: { project } });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /** 
  * GET /api/projects/:userId
  */

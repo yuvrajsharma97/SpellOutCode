@@ -1,18 +1,16 @@
 const { Router } = require("express");
 const {
   createUpdate,
-  getUpdatesByProject,
-  getUpdateById,
   editUpdate,
   deleteUpdate,
+  getUpdatesByProject,
 } = require("../controllers/updateController");
 const protect = require("../middleware/authMiddleware");
 
 const router = Router();
 
 // ── Public routes
-router.get("/project/:projectId", getUpdatesByProject);
-router.get("/getUpdate/:id", getUpdateById);
+router.get("/:projectId/updates", getUpdatesByProject);
 
 router.use(protect);
 

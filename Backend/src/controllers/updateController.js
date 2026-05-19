@@ -11,7 +11,10 @@ const AppError = require("../utils/appError");
  */
 const createUpdate = async (req, res, next) => {
   try {
-    const parsed = createUpdateSchema.safeParse(req.body);
+    const parsed = createUpdateSchema.safeParse({
+      ...req.body,
+      projectId: req.body.projectId,
+    });
     if (!parsed.success) {
       return next(new AppError(parsed.error.errors[0].message, 400));
     }

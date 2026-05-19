@@ -2,6 +2,7 @@ const User = require("../models/user");
 const AppError = require("../utils/appError");
 const { sendContactEmail } = require("../services/contactServices");
 const { contactSchema } = require("../validators/contactValidator");
+const Project = require("../models/project");
 
 
 const sendEmailToAuthorService = async (
@@ -38,7 +39,21 @@ const sendEmailToAuthor = async (req, res, next) => {
       return next(new AppError(parsed.error.issues[0].message, 400));
     }
      
-    await sendEmailToAuthorService(parsed.data);
+    const { name, email, message } = parsed.data;
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+    if (!user) return next(new AppError("User not found", 404));
+
+    await sendContactEmail(
+      name,
+      email,
+      message,
+      username,
+      user.name,
+      user.email,
+    );
+
     
     res.status(200).json({
       status: "success",

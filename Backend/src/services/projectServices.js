@@ -56,6 +56,18 @@ const getProjectsByUser = async (userId) => {
   return projects;
 };
 
+/**
+ * Get all projects for a given username.
+ */
+const getProjectsByUsername = async (username) => {
+  const user = await User.findOne({ username });
+  if (!user) throw new AppError("User not found", 404);
+  const projects = await Project.find({ author: user._id })
+    .populate("author", "name username avatar roleTitle")
+    .sort({ createdAt: -1 });
+  return projects;
+};
+
 /** 
  * Get single project by slug 
  */
