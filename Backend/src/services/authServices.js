@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const AppError = require("../utils/appError");
 const crypto = require("crypto");
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -11,9 +12,17 @@ const {
   regestrationSuccessEmailTemplate,
 } = require("./contactServices");
 
-/**
- * Register a new user.
- */
+const sanitizeUser = (user) => ({
+  _id: user._id,
+  name: user.name,
+  username: user.username,
+  email: user.email,
+  avatar: user.avatar,
+  bio: user.bio,
+  roleTitle: user.roleTitle,
+  socialLinks: user.socialLinks,
+  skills: user.skills,
+});
 
 const registerUser = async ({ name, username, email, password }) => {
   const existingUser = await User.findOne({
@@ -33,19 +42,14 @@ const registerUser = async ({ name, username, email, password }) => {
   user.refreshToken = refreshToken;
   await user.save();
 
-  // Send registration success email
-  await regestrationSuccessEmailTemplate(user.email, user.name);
-  
+  regestrationSuccessEmailTemplate(user.email, user.name).catch(console.error);
+
   return {
     user: sanitizeUser(user),
     accessToken,
     refreshToken,
   };
 };
-
-/**
- * Login user by validating credentials.
- */
 
 const loginUser = async ({ email, password }) => {
   const user = await User.findOne({ email }).select("+password +refreshToken");
@@ -67,29 +71,19 @@ const loginUser = async ({ email, password }) => {
   };
 };
 
-/**
- * Get current user details by ID.
- */
-
 const getMe = async (userId) => {
   const user = await User.findById(userId);
+
   if (!user) {
     throw new AppError("User not found", 404);
   }
+
   return sanitizeUser(user);
 };
-
-/**
- * Logout user by clearing their refresh token.
- */
 
 const logoutUser = async (userId) => {
   await User.findByIdAndUpdate(userId, { refreshToken: null });
 };
-
-/**
- * Rotate refresh token: validate incoming token and issue new tokens.
- */
 
 const rotateRefreshToken = async (incomingRefreshToken) => {
   if (!incomingRefreshToken) {
@@ -104,32 +98,23 @@ const rotateRefreshToken = async (incomingRefreshToken) => {
     throw new AppError("Invalid or expired refresh token", 403);
   }
 
-  const newAccessToken = generateAccessToken(user._id);
-  const newRefreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
 
-  user.refreshToken = newRefreshToken;
+  user.refreshToken = refreshToken;
   await user.save();
 
   return {
     user: sanitizeUser(user),
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
+    accessToken,
+    refreshToken,
   };
 };
-
-/**
- * Forgot Password: Generate reset token and send email with instructions.
- */
 
 const forgotPassword = async (email) => {
   const user = await User.findOne({ email });
 
-  if (!user) {
-    throw new AppError(
-      "If an account exists, a reset link has been sent. Please check your email.",
-      200,
-    );
-  }
+  if (!user) return;
 
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
@@ -137,13 +122,7 @@ const forgotPassword = async (email) => {
   const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
   await sendPasswordResetEmail(user.email, user.name, resetURL);
-
-  return;
 };
-
-/**
- * Reset Password: Validate token, update password, and clear reset token fields.
- */
 
 const resetPassword = async (resetToken, newPassword) => {
   const hashedToken = crypto
@@ -157,21 +136,17 @@ const resetPassword = async (resetToken, newPassword) => {
   }).select("+password");
 
   if (!user) {
-    throw new AppError("Invalid or expired reset token, Please try again", 400);
+    throw new AppError("Invalid or expired reset token", 400);
   }
 
   user.password = newPassword;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
-  await user.save();
 
-  return;
+  await user.save();
 };
 
-/**
- * Change Password: Validate current password and update to new password.
- */
-const changePassword = async (userId, currentPassword, newPassword) => {
+const changePassword = async (userId, { currentPassword, newPassword }) => {
   const user = await User.findById(userId).select("+password");
 
   if (!(await user.comparePassword(currentPassword))) {
@@ -180,20 +155,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
 
   user.password = newPassword;
   await user.save();
-  return;
 };
-
-const sanitizeUser = (user) => ({
-  _id: user._id,
-  name: user.name,
-  username: user.username,
-  email: user.email,
-  avatar: user.avatar,
-  bio: user.bio,
-  roleTitle: user.roleTitle,
-  socialLinks: user.socialLinks,
-  skills: user.skills,
-});
 
 module.exports = {
   registerUser,
@@ -203,5 +165,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getMe,
-  changePassword  
+  changePassword,
 };

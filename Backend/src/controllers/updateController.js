@@ -1,4 +1,5 @@
 const updateService = require("../services/updateServices");
+const Project = require("../models/project");
 const {
   createUpdateSchema,
   updateUpdateSchema,
@@ -6,17 +7,17 @@ const {
 const AppError = require("../utils/appError");
 
 /**
- * POST /api/updates
- * Body: { project, title, content, published }
+ * POST /api/projects/:projectId/updates
  */
 const createUpdate = async (req, res, next) => {
   try {
     const parsed = createUpdateSchema.safeParse({
       ...req.body,
-      projectId: req.body.projectId,
+      project: req.params.projectId,
     });
+
     if (!parsed.success) {
-      return next(new AppError(parsed.error.errors[0].message, 400));
+      return next(new AppError(parsed.error.issues[0].message, 400));
     }
 
     const update = await updateService.createUpdate(req.user.id, parsed.data);
@@ -32,8 +33,7 @@ const createUpdate = async (req, res, next) => {
 };
 
 /**
- * GET /api/updates/project/:projectId
- * Body: porjectId in URL params
+ * GET /api/projects/:projectId/updates
  */
 const getUpdatesByProject = async (req, res, next) => {
   try {
@@ -51,8 +51,29 @@ const getUpdatesByProject = async (req, res, next) => {
 };
 
 /**
- * GET /api/updates/:id
- * Body: updateId in URL params
+ * GET public updates by project slug
+ */
+const getUpdatesBySlug = async (req, res, next) => {
+  try {
+    const project = await Project.findOne({ slug: req.params.slug });
+
+    if (!project) {
+      return next(new AppError("Project not found", 404));
+    }
+
+    const updates = await updateService.getUpdatesByProject(project._id);
+
+    res.status(200).json({
+      success: true,
+      data: { updates },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET single update
  */
 const getUpdateById = async (req, res, next) => {
   try {
@@ -68,14 +89,30 @@ const getUpdateById = async (req, res, next) => {
 };
 
 /**
+ * GET single public update by slug + id
+ */
+const getUpdateBySlugAndId = async (req, res, next) => {
+  try {
+    const update = await updateService.getUpdateById(req.params.updateId);
+
+    res.status(200).json({
+      success: true,
+      data: { update },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * PATCH /api/updates/:id
- * Body: updateId in URL params and update data in request body
  */
 const editUpdate = async (req, res, next) => {
   try {
     const parsed = updateUpdateSchema.safeParse(req.body);
+
     if (!parsed.success) {
-      return next(new AppError(parsed.error.errors[0].message, 400));
+      return next(new AppError(parsed.error.issues[0].message, 400));
     }
 
     const update = await updateService.editUpdate(
@@ -96,7 +133,6 @@ const editUpdate = async (req, res, next) => {
 
 /**
  * DELETE /api/updates/:id
- * Body: updateId in URL params
  */
 const deleteUpdate = async (req, res, next) => {
   try {
@@ -114,7 +150,9 @@ const deleteUpdate = async (req, res, next) => {
 module.exports = {
   createUpdate,
   getUpdatesByProject,
+  getUpdatesBySlug,
   getUpdateById,
+  getUpdateBySlugAndId,
   editUpdate,
   deleteUpdate,
 };

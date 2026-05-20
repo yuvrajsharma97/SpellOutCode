@@ -5,12 +5,13 @@ const {
 } = require("../validators/projectValidator");
 const AppError = require("../utils/appError");
 
-/** 
+/**
  * POST /api/projects/create-new-project
  */
 const createProject = async (req, res, next) => {
   try {
     const parsed = createProjectSchema.safeParse(req.body);
+
     if (!parsed.success) {
       return next(new AppError(parsed.error.issues[0].message, 400));
     }
@@ -36,7 +37,11 @@ const createProject = async (req, res, next) => {
 const getMyProjects = async (req, res, next) => {
   try {
     const projects = await projectService.getProjectsByUser(req.user.id);
-    res.status(200).json({ success: true, data: { projects } });
+
+    res.status(200).json({
+      success: true,
+      data: { projects },
+    });
   } catch (error) {
     next(error);
   }
@@ -50,32 +55,6 @@ const getProjectsByUsername = async (req, res, next) => {
     const projects = await projectService.getProjectsByUsername(
       req.params.username,
     );
-    res.status(200).json({ success: true, data: { projects } });
-  } catch (error) {     
-    next(error);
-  }
-};
-
-/**
- * GET /api/users/:username/projects/:slug
- */
-const getProjectBySlug = async (req, res, next) => {
-  try {
-    const project = await projectService.getProjectBySlug(req.params.slug);
-    res.status(200).json({ success: true, data: { project } });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/** 
- * GET /api/projects/:userId
- */
-const getProjectsByUser = async (req, res, next) => {
-  try {
-    const projects = await projectService.getProjectsByUser(
-      req.params.userId,
-    );
 
     res.status(200).json({
       success: true,
@@ -86,8 +65,8 @@ const getProjectsByUser = async (req, res, next) => {
   }
 };
 
-/** 
- * GET /api/projects/slug/:slug 
+/**
+ * GET /api/users/:username/projects/:slug
  */
 const getProjectBySlug = async (req, res, next) => {
   try {
@@ -102,12 +81,13 @@ const getProjectBySlug = async (req, res, next) => {
   }
 };
 
-/** 
- * PATCH /api/projects/:id 
+/**
+ * PATCH /api/projects/:id
  */
 const updateProject = async (req, res, next) => {
   try {
     const parsed = updateProjectSchema.safeParse(req.body);
+
     if (!parsed.success) {
       return next(new AppError(parsed.error.issues[0].message, 400));
     }
@@ -128,8 +108,8 @@ const updateProject = async (req, res, next) => {
   }
 };
 
-/** 
- * DELETE /api/projects/:id 
+/**
+ * DELETE /api/projects/:id
  */
 const deleteProject = async (req, res, next) => {
   try {
@@ -146,7 +126,8 @@ const deleteProject = async (req, res, next) => {
 
 module.exports = {
   createProject,
-  getProjectsByUser,
+  getMyProjects,
+  getProjectsByUsername,
   getProjectBySlug,
   updateProject,
   deleteProject,

@@ -133,6 +133,7 @@ const deleteProject = async (projectId, userId) => {
 module.exports = {
   createProject,
   getProjectsByUser,
+  getProjectsByUsername,
   getProjectBySlug,
   updateProject,
   deleteProject,
