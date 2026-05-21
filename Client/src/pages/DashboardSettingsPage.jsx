@@ -80,7 +80,7 @@ function ProfileTab() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name || "",
-      role: user?.role || "",
+      roleTitle: user?.roleTitle || "",
       bio: user?.bio || "",
     },
   });
@@ -106,12 +106,12 @@ function ProfileTab() {
 
       <FormField
         label="Role / title"
-        error={errors.role?.message}
+        error={errors.roleTitle?.message}
         hint="e.g. Full-stack engineer, Indie maker">
         <TextInput
           placeholder="Full-stack engineer"
-          error={errors.role?.message}
-          {...register("role")}
+          error={errors.roleTitle?.message}
+          {...register("roleTitle")}
         />
       </FormField>
 

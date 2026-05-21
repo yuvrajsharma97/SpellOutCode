@@ -6,17 +6,17 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z.string().min(2),
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(32, "Username must be under 32 characters")
+    .min(3)
+    .max(30)
     .regex(
-      /^[a-z0-9-]+$/,
-      "Username can only contain lowercase letters, numbers, and hyphens",
+      /^[a-z0-9_]+$/,
+      "Username can contain lowercase letters, numbers, and underscores only",
     ),
-  email: z.string().email("Enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email(),
+  password: z.string().min(6),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -52,41 +52,30 @@ export const projectSchema = z.object({
 });
 
 export const updateSchema = z.object({
-  title: z
-    .string()
-    .min(2, "Update title is required")
-    .max(120, "Title is too long"),
-  content: z.string().min(1, "Update content is required"),
-  tag: z
-    .enum([
-      "milestone",
-      "blocker",
-      "decision",
-      "learning",
-      "kickoff",
-      "note",
-      "",
-    ])
-    .optional(),
+  title: z.string().min(2),
+  summary: z.string().min(2),
+  content: z.string().min(1),
+  tags: z.array(z.string()).default([]),
+  published: z.boolean().default(false),
 });
 
 export const profileSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  role: z.string().max(80, "Role must be under 80 characters").optional(),
-  bio: z.string().max(400, "Bio must be under 400 characters").optional(),
-  website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
+  name: z.string().min(2).max(80),
+  roleTitle: z.string().max(80).optional(),
+  bio: z.string().max(500).optional(),
+});
+
+export const socialSchema = z.object({
   github: z.string().optional(),
   twitter: z.string().optional(),
   linkedin: z.string().optional(),
+  website: z.string().optional(),
 });
 
 export const contactSchema = z.object({
-  senderName: z.string().min(2, "Your name is required"),
-  senderEmail: z.string().email("Enter a valid email address"),
-  message: z
-    .string()
-    .min(10, "Message must be at least 10 characters")
-    .max(1000, "Message is too long"),
+  senderName: z.string().min(2),
+  senderEmail: z.string().email(),
+  message: z.string().min(10).max(1000),
 });
 
 export const changePasswordSchema = z

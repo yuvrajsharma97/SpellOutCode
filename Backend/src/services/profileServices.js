@@ -6,8 +6,14 @@ const imageService = require("./uploadToImageKitService");
  * get profile by username (public route) 
  */
 const getProfileByUsername = async (username) => {
-  const user = await User.findOne({ username }); // ← was findById
-  if (!user) throw new AppError("Profile not found", 404);
+  const user = await User.findOne({ username }).select(
+    "name username bio roleTitle socialLinks skills avatar",
+  );
+
+  if (!user) {
+    throw new AppError("Profile not found", 404);
+  }
+
   return user;
 };
 

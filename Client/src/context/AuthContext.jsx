@@ -1,73 +1,79 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
-import { authApi } from "../api/auth";
-
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { authApi } from "../services/auth";
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const fetchMe = useCallback(async () => {
+  const fetchMe = async () => {
     try {
-      const data = await authApi.me();
-      setUser(data.user);
-    } catch {
+      const response = await authApi.me();
+
+      // axios interceptor returns response.data
+      // backend shape:
+      // { success, data: { user } }
+
+      setUser(response?.data?.user || null);
+    } catch (error) {
       setUser(null);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchMe();
-  }, [fetchMe]);
-
-  const login = async (credentials) => {
-    const data = await authApi.login(credentials);
-    setUser(data.user);
-    return data;
-  };
+  }, []);
 
   const register = async (payload) => {
-    const data = await authApi.register(payload);
-    setUser(data.user);
-    return data;
+    const response = await authApi.register(payload);
+
+    setUser(response?.data?.user || null);
+
+    return response;
+  };
+
+  const login = async (payload) => {
+    const response = await authApi.login(payload);
+
+    setUser(response?.data?.user || null);
+
+    return response;
   };
 
   const logout = async () => {
-    await authApi.logout();
-    setUser(null);
+    try {
+      await authApi.logout();
+    } finally {
+      setUser(null);
+    }
   };
 
-  const updateUser = (updates) => {
-    setUser((prev) => ({ ...prev, ...updates }));
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        login,
-        register,
-        logout,
-        updateUser,
-        refetch: fetchMe,
-      }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      setUser,
+      register,
+      login,
+      logout,
+      fetchMe,
+      isAuthenticated: !!user,
+    }),
+    [user, loading],
   );
-}
 
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
+  return context;
+};

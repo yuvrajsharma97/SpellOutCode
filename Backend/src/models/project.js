@@ -4,46 +4,67 @@ const projectSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Project title is required"],
+      required: true,
       trim: true,
-      maxlength: [100, "Title cannot exceed 100 characters"],
     },
-    slug: {
+
+    summary: {
       type: String,
-      unique: true,
-      lowercase: true,
       trim: true,
     },
+
     description: {
       type: String,
-      required: [true, "Project description is required"],
-      trim: true,
-      maxlength: [1000, "Description cannot exceed 1000 characters"],
+      required: true,
     },
-    coverImage: {
-      url: { type: String, default: "" },
-      fileId: { type: String, default: "" },
+
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
     },
-    tags: {
-      type: [String],
-      default: [],
+
+    techStack: [
+      {
+        type: String,
+      },
+    ],
+
+    githubUrl: {
+      type: String,
     },
+
+    liveUrl: {
+      type: String,
+    },
+
     status: {
       type: String,
-      enum: ["planned", "in-progress", "completed"],
+      enum: ["planned", "in-progress", "completed", "archived"],
       default: "planned",
     },
+
+    tags: [
+      {
+        type: String,
+      },
+    ],
+
+    coverImage: {
+      url: String,
+      fileId: String,
+    },
+
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
-projectSchema.index({ author: 1, createdAt: -1 });
-
-const Project = mongoose.model("Project", projectSchema);
-
-module.exports = Project;
+module.exports = mongoose.model("Project", projectSchema);

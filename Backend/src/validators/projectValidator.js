@@ -1,55 +1,28 @@
-const { z } = require("zod");
+const z = require("zod");
 
-const VALID_STATUSES = ["planned", "in-progress", "completed"];
+const allowedStatuses = ["planned", "in-progress", "completed", "archived"];
 
 const createProjectSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Title is required")
-    .max(100, "Title cannot exceed 100 characters"),
-  description: z
-    .string()
-    .trim()
-    .min(1, "Description is required")
-    .max(1000, "Description cannot exceed 1000 characters"),
-  tags: z
-    .array(z.string().trim())
-    .max(10, "Cannot add more than 10 tags")
-    .default([]),
-  status: z
-    .enum(VALID_STATUSES, {
-      errorMap: () => ({
-        message: "Status must be planned, in-progress, or completed",
-      }),
-    })
-    .default("planned"),
+  title: z.string().trim().min(2).max(120),
+
+  summary: z.string().trim().max(300).optional(),
+
+  description: z.string().trim().min(10),
+
+  techStack: z.array(z.string()).default([]),
+
+  githubUrl: z.string().url().optional(),
+
+  liveUrl: z.string().url().optional(),
+
+  tags: z.array(z.string()).default([]),
+
+  status: z.enum(allowedStatuses).default("planned"),
 });
 
-const updateProjectSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Title cannot be empty")
-    .max(100, "Title cannot exceed 100 characters")
-    .optional(),
-  description: z
-    .string()
-    .trim()
-    .min(1, "Description cannot be empty")
-    .max(1000, "Description cannot exceed 1000 characters")
-    .optional(),
-  tags: z
-    .array(z.string().trim())
-    .max(10, "Cannot add more than 10 tags")
-    .optional(),
-  status: z
-    .enum(VALID_STATUSES, {
-      errorMap: () => ({
-        message: "Status must be planned, in-progress, or completed",
-      }),
-    })
-    .optional(),
-});
+const updateProjectSchema = createProjectSchema.partial();
 
-module.exports = { createProjectSchema, updateProjectSchema };
+module.exports = {
+  createProjectSchema,
+  updateProjectSchema,
+};
