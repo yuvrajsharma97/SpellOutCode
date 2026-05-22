@@ -1,15 +1,12 @@
 const imagekit = require("../config/imagekit");
 const AppError = require("../utils/appError");
 
-// Upload a file buffer to ImageKit 
+// Upload a file buffer to ImageKit
 const uploadImage = async (fileBuffer, fileName, folder) => {
-
-  console.log("Uploading image to ImageKit:",fileName, folder, fileBuffer);
-
   try {
     const result = await imagekit.files.upload({
       file: fileBuffer.toString("base64"),
-      fileName: `${fileName} + ${Date.now()}`,
+      fileName: `${fileName}-${Date.now()}`,
       folder: folder,
     });
 

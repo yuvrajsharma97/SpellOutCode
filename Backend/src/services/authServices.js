@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const AppError = require("../utils/appError");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 const {
   generateAccessToken,
@@ -9,7 +10,7 @@ const {
 
 const {
   sendPasswordResetEmail,
-  regestrationSuccessEmailTemplate,
+  registrationSuccessEmailTemplate,
 } = require("./contactServices");
 
 const sanitizeUser = (user) => ({
@@ -42,7 +43,7 @@ const registerUser = async ({ name, username, email, password }) => {
   user.refreshToken = refreshToken;
   await user.save();
 
-  regestrationSuccessEmailTemplate(user.email, user.name).catch(console.error);
+  registrationSuccessEmailTemplate(user.email, user.name).catch(console.error);
 
   return {
     user: sanitizeUser(user),
@@ -81,8 +82,10 @@ const getMe = async (userId) => {
   return sanitizeUser(user);
 };
 
-const logoutUser = async (userId) => {
-  await User.findByIdAndUpdate(userId, { refreshToken: null });
+const logoutUser = async (refreshToken) => {
+  if (refreshToken) {
+    await User.findOneAndUpdate({ refreshToken }, { refreshToken: null });
+  }
 };
 
 const rotateRefreshToken = async (incomingRefreshToken) => {
@@ -90,12 +93,18 @@ const rotateRefreshToken = async (incomingRefreshToken) => {
     throw new AppError("No refresh token provided", 401);
   }
 
+  try {
+    jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_SECRET);
+  } catch (error) {
+    throw new AppError("Invalid or expired refresh token", 403);
+  }
+
   const user = await User.findOne({
     refreshToken: incomingRefreshToken,
   }).select("+refreshToken");
 
   if (!user) {
-    throw new AppError("Invalid or expired refresh token", 403);
+    throw new AppError("Token reuse detected or session revoked", 403);
   }
 
   const accessToken = generateAccessToken(user._id);

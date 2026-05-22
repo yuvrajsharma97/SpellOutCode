@@ -1,5 +1,6 @@
 import api from "./axiosInstance";
 
 export const contactApi = {
-  send: (username, payload) => api.post(`/users/${username}/contact`, payload),
+  send: (projectId, payload) =>
+    api.post(`/contact/contactProjectAuthor/${projectId}`, payload),
 };

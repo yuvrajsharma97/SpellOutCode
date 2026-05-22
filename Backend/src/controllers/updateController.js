@@ -33,7 +33,7 @@ const createUpdate = async (req, res, next) => {
 };
 
 /**
- * GET /api/projects/:projectId/updates
+ * GET /api/projects/:projectId/updates  (public — published only)
  */
 const getUpdatesByProject = async (req, res, next) => {
   try {
@@ -73,15 +73,18 @@ const getUpdatesBySlug = async (req, res, next) => {
 };
 
 /**
- * GET single update
+ * GET /api/projects/:projectId/my-updates  (protected — all updates, owner only)
  */
-const getUpdateById = async (req, res, next) => {
+const getMyUpdatesByProject = async (req, res, next) => {
   try {
-    const update = await updateService.getUpdateById(req.params.id);
+    const updates = await updateService.getUpdatesByProject(
+      req.params.projectId,
+      false,
+    );
 
     res.status(200).json({
       success: true,
-      data: { update },
+      data: { updates },
     });
   } catch (error) {
     next(error);
@@ -150,8 +153,8 @@ const deleteUpdate = async (req, res, next) => {
 module.exports = {
   createUpdate,
   getUpdatesByProject,
+  getMyUpdatesByProject,
   getUpdatesBySlug,
-  getUpdateById,
   getUpdateBySlugAndId,
   editUpdate,
   deleteUpdate,

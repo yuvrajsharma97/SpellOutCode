@@ -1,10 +1,14 @@
+import DOMPurify from "dompurify";
+
 export default function RichTextRenderer({ content }) {
   if (!content) return null;
+
+  const clean = DOMPurify.sanitize(content);
 
   return (
     <div
       className="prose"
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: clean }}
       style={{
         fontFamily: "var(--font-sans)",
         fontSize: "15px",

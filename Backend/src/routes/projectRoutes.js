@@ -9,6 +9,7 @@ const {
 
 const {
   getUpdatesByProject,
+  getMyUpdatesByProject,
   createUpdate,
 } = require("../controllers/updateController");
 
@@ -27,6 +28,8 @@ router.get("/:projectId/updates", getUpdatesByProject);
 router.use(protect);
 
 router.get("/my-projects", getMyProjects);
+
+router.get("/:projectId/my-updates", getMyUpdatesByProject);
 
 router.post("/create-new-project", createProject);
 

@@ -1,5 +1,10 @@
 const authService = require("../services/authServices");
-const { registerSchema, loginSchema } = require("../validators/authValidator");
+const {
+  registerSchema,
+  loginSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+} = require("../validators/authValidator");
 const { forgotPasswordSchema } = require("../validators/contactValidator");
 const { setAuthCookies, clearAuthCookies } = require("../utils/cookieHelpers");
 const AppError = require("../utils/appError");
@@ -16,7 +21,7 @@ const register = async (req, res, next) => {
       parsed.data,
     );
 
-    await setAuthCookies(res, accessToken, refreshToken);
+    setAuthCookies(res, accessToken, refreshToken);
 
     res.status(201).json({
       success: true,
@@ -40,7 +45,7 @@ const login = async (req, res, next) => {
       parsed.data,
     );
 
-    await setAuthCookies(res, accessToken, refreshToken);
+    setAuthCookies(res, accessToken, refreshToken);
 
     res.status(200).json({
       success: true,
@@ -67,7 +72,8 @@ const getMe = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    await authService.logoutUser(req.user.id);
+    await authService.logoutUser(req.cookies?.refreshToken);
+
     clearAuthCookies(res);
 
     res.status(200).json({
@@ -83,9 +89,10 @@ const refresh = async (req, res, next) => {
   try {
     const incomingRefreshToken = req.cookies?.refreshToken;
 
-    const { user, accessToken, refreshToken } = await authService.rotateRefreshToken(incomingRefreshToken);
+    const { user, accessToken, refreshToken } =
+      await authService.rotateRefreshToken(incomingRefreshToken);
 
-    await setAuthCookies(res, accessToken, refreshToken);
+    setAuthCookies(res, accessToken, refreshToken);
 
     res.status(200).json({
       success: true,
@@ -119,10 +126,13 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    const token = req.params.token;
-    const { password } = req.body;
+    const parsed = resetPasswordSchema.safeParse(req.body);
 
-    await authService.resetPassword(token, password);
+    if (!parsed.success) {
+      return next(new AppError(parsed.error.issues[0].message, 400));
+    }
+
+    await authService.resetPassword(req.params.token, parsed.data.password);
 
     res.status(200).json({
       success: true,
@@ -135,7 +145,13 @@ const resetPassword = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   try {
-    await authService.changePassword(req.user.id, req.body);
+    const parsed = changePasswordSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return next(new AppError(parsed.error.issues[0].message, 400));
+    }
+
+    await authService.changePassword(req.user.id, parsed.data);
 
     res.status(200).json({
       success: true,

@@ -1,6 +1,6 @@
 const sendEmail = require("../utils/sendEmail");
 
-const regestrationSuccessEmailTemplate = async(userEmail, name) => {
+const registrationSuccessEmailTemplate = async(userEmail, name) => {
     const subject = "Welcome to Spell Out Code!";
 
     const text = `Welcome to Spell Out Code, ${name}! 
@@ -36,7 +36,7 @@ const regestrationSuccessEmailTemplate = async(userEmail, name) => {
     await sendEmail(userEmail, subject, text, html);
 };
 
-const sendContactEmail = async (senderName, senderEmail, message, projectSlug, authorName, authorEmail) => {
+const sendContactEmail = async ({ to, senderName, senderEmail, message, projectSlug, authorName }) => {
     const subject = ` ${authorName}, You have a new message on your project ${projectSlug}`;
     const text = `You have received a new message from the contact form on your project ${projectSlug}, on your Spell Out Code website profile.
     \n\nName: ${senderName}\nEmail: ${senderEmail}\nMessage: ${message}`;
@@ -56,7 +56,7 @@ const sendContactEmail = async (senderName, senderEmail, message, projectSlug, a
         <p style="margin-top: 20px;">Please respond to the sender's email at your earliest convenience, at ${senderEmail}</p>
     </div>
     `;
-    await sendEmail(authorEmail, subject, text, html);
+    await sendEmail(to, subject, text, html);
 };
 
 const sendPasswordResetEmail = async (userEmail, userName, resetLink) => {
@@ -71,7 +71,7 @@ const sendPasswordResetEmail = async (userEmail, userName, resetLink) => {
 };
 
 module.exports = {
-    regestrationSuccessEmailTemplate,
+    registrationSuccessEmailTemplate,
     sendPasswordResetEmail,
     sendContactEmail
 };

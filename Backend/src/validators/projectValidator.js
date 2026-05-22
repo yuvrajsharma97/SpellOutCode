@@ -1,6 +1,6 @@
 const z = require("zod");
 
-const allowedStatuses = ["planned", "in-progress", "completed", "archived"];
+const allowedStatuses = ["active", "paused", "completed", "archived"];
 
 const createProjectSchema = z.object({
   title: z.string().trim().min(2).max(120),
@@ -17,7 +17,7 @@ const createProjectSchema = z.object({
 
   tags: z.array(z.string()).default([]),
 
-  status: z.enum(allowedStatuses).default("planned"),
+  status: z.enum(allowedStatuses).default("active"),
 });
 
 const updateProjectSchema = createProjectSchema.partial();

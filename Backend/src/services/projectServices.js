@@ -1,3 +1,4 @@
+const Update = require("../models/update");
 const slugify = require("slugify");
 const Project = require("../models/project");
 const User = require("../models/user");
@@ -68,8 +69,8 @@ const getProjectsByUsername = async (username) => {
   return projects;
 };
 
-/** 
- * Get single project by slug 
+/**
+ * Get single project by slug
  */
 const getProjectBySlug = async (slug) => {
   const project = await Project.findOne({ slug }).populate(
@@ -127,6 +128,7 @@ const deleteProject = async (projectId, userId) => {
     throw new AppError("You are not authorized to delete this project", 403);
   }
 
+  await Update.deleteMany({ project: projectId });
   await Project.findByIdAndDelete(projectId);
 };
 

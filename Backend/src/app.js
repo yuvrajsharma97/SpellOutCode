@@ -1,17 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const mongoSanitize = require('express-mongo-sanitize');
-const rateLimit = require('express-rate-limit');
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const rateLimit = require("express-rate-limit");
 const errorHandler = require("./middleware/errorHandlerMiddleware");
 const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const updateRoutes = require("./routes/updateRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-const AppError = require('./utils/appError');
+const AppError = require("./utils/appError");
 
 const app = express();
 
@@ -40,18 +40,16 @@ app.use(express.json({ limit: "10kb" }));
 
 app.use(express.urlencoded({ extended: true }));
 
-/**
- app.use(
+app.use(
   mongoSanitize({
     replaceWith: "_",
   }),
 );
-*/
 
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
 /**
@@ -76,7 +74,5 @@ app.use((req, res, next) => {
 
 // Global error handling middleware
 app.use(errorHandler);
-
-
 
 module.exports = app;

@@ -1,4 +1,4 @@
-import { Github, Globe, Linkedin, Twitter } from "lucide-react";
+// import { Github ,Globe, Linkedin, Twitter } from "lucide-react";
 
 const ProfileRail = ({ profile }) => {
   return (
@@ -32,7 +32,7 @@ const ProfileRail = ({ profile }) => {
               href={`https://github.com/${profile.socialLinks.github}`}
               target="_blank"
               rel="noreferrer">
-              <Github size={18} />
+              {/* <Github size={18} /> */}
             </a>
           )}
 
@@ -41,7 +41,7 @@ const ProfileRail = ({ profile }) => {
               href={profile.socialLinks.linkedin}
               target="_blank"
               rel="noreferrer">
-              <Linkedin size={18} />
+              {/* <Linkedin size={18} /> */}
             </a>
           )}
 
@@ -50,7 +50,7 @@ const ProfileRail = ({ profile }) => {
               href={`https://twitter.com/${profile.socialLinks.twitter}`}
               target="_blank"
               rel="noreferrer">
-              <Twitter size={18} />
+              {/* <Twitter size={18} /> */}
             </a>
           )}
 
@@ -59,7 +59,7 @@ const ProfileRail = ({ profile }) => {
               href={profile.socialLinks.website}
               target="_blank"
               rel="noreferrer">
-              <Globe size={18} />
+              {/* <Globe size={18} /> */}
             </a>
           )}
         </div>

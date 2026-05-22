@@ -37,8 +37,11 @@ const getUpdatesByProject = async (projectId, publishedOnly = true) => {
     });
 };
 
-const getUpdateById = async (id) => {
-  const update = await Update.findById(id).populate(
+const getUpdateById = async (id, publishedOnly = true) => {
+  const filter = { _id: id };
+  if (publishedOnly) filter.published = true;
+
+  const update = await Update.findOne(filter).populate(
     "author",
     "name username avatar",
   );

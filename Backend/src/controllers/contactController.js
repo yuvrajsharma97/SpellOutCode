@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const Project = require("../models/project");
 const AppError = require("../utils/appError");
 const { contactSchema } = require("../validators/contactValidator");
 const { sendContactEmail } = require("../services/contactServices");
@@ -13,20 +13,22 @@ const sendEmailToAuthor = async (req, res, next) => {
 
     const { senderName, senderEmail, message } = parsed.data;
 
-    const author = await User.findOne({
-      username: req.params.username,
-    });
+    const project = await Project.findById(req.params.projectId).populate(
+      "author",
+      "name email username",
+    );
 
-    if (!author) {
-      return next(new AppError("Author not found", 404));
+    if (!project || !project.author) {
+      return next(new AppError("Project or author not found", 404));
     }
 
     await sendContactEmail({
-      to: author.email,
+      to: project.author.email,
       senderName,
       senderEmail,
       message,
-      authorName: author.name,
+      authorName: project.author.name,
+      projectSlug: project.slug,
     });
 
     res.status(200).json({
