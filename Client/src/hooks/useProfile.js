@@ -7,5 +7,6 @@ export function useProfile(username) {
     queryKey: queryKeys.profile(username),
     queryFn: () => profilesApi.getProfile(username),
     enabled: !!username,
+    select: (res) => res?.data?.user ?? null,
   });
 }

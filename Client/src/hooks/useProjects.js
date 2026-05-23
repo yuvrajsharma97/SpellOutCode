@@ -7,6 +7,7 @@ export function usePublicProjects(username) {
     queryKey: queryKeys.projects(username),
     queryFn: () => projectsApi.getByUsername(username),
     enabled: !!username,
+    select: (res) => res?.data?.projects ?? [],
   });
 }
 
@@ -15,6 +16,7 @@ export function usePublicProject(username, slug) {
     queryKey: queryKeys.project(username, slug),
     queryFn: () => projectsApi.getBySlug(username, slug),
     enabled: !!username && !!slug,
+    select: (res) => res?.data?.project ?? null,
   });
 }
 
@@ -22,6 +24,7 @@ export function useMyProjects() {
   return useQuery({
     queryKey: queryKeys.myProjects(),
     queryFn: () => projectsApi.getMyProjects(),
+    select: (res) => res?.data?.projects ?? [],
   });
 }
 

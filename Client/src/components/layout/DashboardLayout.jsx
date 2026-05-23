@@ -2,8 +2,6 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderOpen,
-  FileText,
-  User,
   Settings,
   LogOut,
   ExternalLink,
@@ -14,7 +12,6 @@ import { useToast } from "../../context/ToastContext";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/dashboard/projects", label: "Projects", icon: FolderOpen },
-  { to: "/dashboard/updates", label: "Updates", icon: FileText },
 ];
 
 const ACCOUNT_ITEMS = [
@@ -155,24 +152,38 @@ export default function DashboardLayout() {
                   gap: "10px",
                   marginBottom: "12px",
                 }}>
-                <div
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "4px",
-                    background: "var(--ink)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    color: "var(--paper)",
-                    fontWeight: 500,
-                    flexShrink: 0,
-                  }}>
-                  {user.name?.slice(0, 2).toUpperCase() ||
-                    user.username?.slice(0, 2).toUpperCase()}
-                </div>
+                {user.avatar?.url ? (
+                  <img
+                    src={user.avatar.url}
+                    alt={user.name}
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "4px",
+                      objectFit: "cover",
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "4px",
+                      background: "var(--ink)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "11px",
+                      color: "var(--paper)",
+                      fontWeight: 500,
+                      flexShrink: 0,
+                    }}>
+                    {user.name?.slice(0, 2).toUpperCase() ||
+                      user.username?.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <div
                     style={{

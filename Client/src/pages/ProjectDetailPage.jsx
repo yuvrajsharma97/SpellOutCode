@@ -21,8 +21,8 @@ export default function ProjectDetailPage() {
     slug,
   );
 
-  const project = projectData?.project;
-  const updates = updatesData?.updates || [];
+  const project = projectData;
+  const updates = updatesData ?? [];
 
   if (isError) {
     return (

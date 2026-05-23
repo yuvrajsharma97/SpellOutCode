@@ -7,4 +7,5 @@ export const profilesApi = {
     api.post("/users/me/avatar", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
+  removeAvatar: () => api.delete("/users/me/avatar"),
 };

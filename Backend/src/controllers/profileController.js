@@ -3,6 +3,8 @@ const { updateProfileSchema } = require("../validators/profileValidator");
 const AppError = require("../utils/appError");
 
 
+
+
 /**
  * GET /api/users/:username
  * Param: username
@@ -76,4 +78,21 @@ const updateAvatar = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar };
+/**
+ * DELETE /api/users/me/avatar
+ */
+const removeAvatar = async (req, res, next) => {
+  try {
+    const user = await profileService.removeAvatar(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar removed successfully",
+      data: { avatar: user.avatar },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar };

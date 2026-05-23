@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Globe, EyeOff } from "lucide-react";
 import {
   useMyUpdates,
   useCreateUpdate,
@@ -36,11 +36,10 @@ export default function DashboardUpdatesPage() {
   const { projectId } = useParams();
   const { addToast } = useToast();
 
-  const { data: projectsData } = useMyProjects();
-  const project = projectsData?.projects?.find((p) => p._id === projectId);
+  const { data: projects } = useMyProjects();
+  const project = projects?.find((p) => p._id === projectId);
 
-  const { data, isLoading } = useMyUpdates(projectId);
-  const updates = data?.updates || [];
+  const { data: updates = [], isLoading } = useMyUpdates(projectId);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUpdate, setEditingUpdate] = useState(null);
@@ -58,12 +57,12 @@ export default function DashboardUpdatesPage() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(updateSchema),
-    defaultValues: { title: "", content: "", tag: "" },
+    defaultValues: { title: "", summary: "", content: "", tag: "", published: false },
   });
 
   const openCreate = () => {
     setEditingUpdate(null);
-    reset({ title: "", content: "", tag: "" });
+    reset({ title: "", summary: "", content: "", tag: "", published: false });
     setModalOpen(true);
   };
 
@@ -71,14 +70,22 @@ export default function DashboardUpdatesPage() {
     setEditingUpdate(update);
     reset({
       title: update.title,
+      summary: update.summary || "",
       content: update.content,
-      tag: update.tag || "",
+      tag: update.tags?.[0] || "",
+      published: update.published || false,
     });
     setModalOpen(true);
   };
 
   const onSubmit = async (data) => {
-    const payload = { ...data, tag: data.tag || undefined };
+    const payload = {
+      title: data.title,
+      summary: data.summary,
+      content: data.content,
+      tags: data.tag ? [data.tag] : [],
+      published: data.published,
+    };
     try {
       if (editingUpdate) {
         await updateUpdate.mutateAsync({
@@ -86,13 +93,13 @@ export default function DashboardUpdatesPage() {
           payload,
           projectId,
         });
-        addToast({ message: "Update saved." });
+        addToast({ message: data.published ? "Update published." : "Draft saved." });
       } else {
         await createUpdate.mutateAsync(payload);
-        addToast({ message: "Update published." });
+        addToast({ message: data.published ? "Update published." : "Draft saved." });
       }
       setModalOpen(false);
-      reset({ title: "", content: "", tag: "" });
+      reset({ title: "", summary: "", content: "", tag: "", published: false });
     } catch (err) {
       addToast({
         message: err.message || "Something went wrong.",
@@ -167,21 +174,35 @@ export default function DashboardUpdatesPage() {
               key={update._id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "110px 1fr auto",
+                gridTemplateColumns: "120px 1fr auto",
                 gap: "24px",
                 padding: "18px 0",
                 borderTop: "1px solid var(--rule)",
                 alignItems: "start",
               }}>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "11px",
-                  color: "var(--ink-4)",
-                  paddingTop: "2px",
-                  letterSpacing: "0.02em",
-                }}>
-                {formatDate(update.createdAt)}
+              <div style={{ paddingTop: "2px" }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    color: "var(--ink-4)",
+                    letterSpacing: "0.02em",
+                    marginBottom: "6px",
+                  }}>
+                  {formatDate(update.createdAt)}
+                </div>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    padding: "1px 6px",
+                    borderRadius: "2px",
+                    letterSpacing: "0.03em",
+                    background: update.published ? "#dcf5e8" : "var(--paper-3)",
+                    color: update.published ? "#2d6a4f" : "var(--ink-4)",
+                  }}>
+                  {update.published ? "published" : "draft"}
+                </span>
               </div>
 
               <div>
@@ -200,7 +221,7 @@ export default function DashboardUpdatesPage() {
                     }}>
                     {update.title}
                   </span>
-                  {update.tag && (
+                  {update.tags?.[0] && (
                     <span
                       style={{
                         fontFamily: "var(--font-mono)",
@@ -211,7 +232,7 @@ export default function DashboardUpdatesPage() {
                         borderRadius: "2px",
                         letterSpacing: "0.02em",
                       }}>
-                      {update.tag}
+                      {update.tags[0]}
                     </span>
                   )}
                 </div>
@@ -227,6 +248,28 @@ export default function DashboardUpdatesPage() {
               </div>
 
               <div style={{ display: "flex", gap: "4px", paddingTop: "2px" }}>
+                <button
+                  onClick={() =>
+                    updateUpdate.mutateAsync({
+                      id: update._id,
+                      payload: { published: !update.published },
+                      projectId,
+                    }).catch((err) =>
+                      addToast({ message: err.message || "Failed to update.", type: "error" })
+                    )
+                  }
+                  title={update.published ? "Unpublish" : "Publish"}
+                  style={iconBtnStyle}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = update.published ? "var(--ink-4)" : "#2d6a4f";
+                    e.currentTarget.style.background = update.published ? "var(--paper-3)" : "#dcf5e8";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "var(--ink-4)";
+                    e.currentTarget.style.background = "transparent";
+                  }}>
+                  {update.published ? <EyeOff size={13} /> : <Globe size={13} />}
+                </button>
                 <button
                   onClick={() => openEdit(update)}
                   title="Edit"
@@ -293,6 +336,14 @@ export default function DashboardUpdatesPage() {
             </FormField>
           </div>
 
+          <FormField label="Summary" error={errors.summary?.message} hint="One-line description shown in the update list">
+            <TextInput
+              placeholder="Brief summary of this update…"
+              error={errors.summary?.message}
+              {...register("summary")}
+            />
+          </FormField>
+
           <FormField label="Content" error={errors.content?.message}>
             <Controller
               name="content"
@@ -321,19 +372,39 @@ export default function DashboardUpdatesPage() {
           <div
             style={{
               display: "flex",
-              gap: "10px",
-              justifyContent: "flex-end",
-              marginTop: "8px",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "16px",
             }}>
-            <Button
-              variant="ghost"
-              onClick={() => setModalOpen(false)}
-              type="button">
-              Cancel
-            </Button>
-            <Button type="submit" isLoading={isSubmitting}>
-              {editingUpdate ? "Save changes" : "Publish update"} →
-            </Button>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                userSelect: "none",
+              }}>
+              <input
+                type="checkbox"
+                {...register("published")}
+                style={{ width: "14px", height: "14px", cursor: "pointer" }}
+              />
+              <span style={{ fontSize: "13px", color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                Publish (visible on public profile)
+              </span>
+            </label>
+
+            <div style={{ display: "flex", gap: "10px" }}>
+              <Button
+                variant="ghost"
+                onClick={() => setModalOpen(false)}
+                type="button">
+                Cancel
+              </Button>
+              <Button type="submit" isLoading={isSubmitting}>
+                {editingUpdate ? "Save changes" : "Save update"} →
+              </Button>
+            </div>
           </div>
         </form>
       </Modal>
@@ -374,7 +445,7 @@ function UpdateListSkeleton() {
           key={i}
           style={{
             display: "grid",
-            gridTemplateColumns: "110px 1fr auto",
+            gridTemplateColumns: "120px 1fr auto",
             gap: "24px",
             padding: "18px 0",
             borderTop: "1px solid var(--rule)",

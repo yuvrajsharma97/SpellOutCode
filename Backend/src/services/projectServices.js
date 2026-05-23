@@ -54,7 +54,17 @@ const getProjectsByUser = async (userId) => {
     .populate("author", "name username avatar roleTitle")
     .sort({ createdAt: -1 });
 
-  return projects;
+  const projectIds = projects.map((p) => p._id);
+  const counts = await Update.aggregate([
+    { $match: { project: { $in: projectIds } } },
+    { $group: { _id: "$project", count: { $sum: 1 } } },
+  ]);
+  const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
+
+  return projects.map((p) => ({
+    ...p.toObject(),
+    updateCount: countMap.get(p._id.toString()) || 0,
+  }));
 };
 
 /**
@@ -63,10 +73,22 @@ const getProjectsByUser = async (userId) => {
 const getProjectsByUsername = async (username) => {
   const user = await User.findOne({ username });
   if (!user) throw new AppError("User not found", 404);
+
   const projects = await Project.find({ author: user._id })
     .populate("author", "name username avatar roleTitle")
     .sort({ createdAt: -1 });
-  return projects;
+
+  const projectIds = projects.map((p) => p._id);
+  const counts = await Update.aggregate([
+    { $match: { project: { $in: projectIds }, published: true } },
+    { $group: { _id: "$project", count: { $sum: 1 } } },
+  ]);
+  const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
+
+  return projects.map((p) => ({
+    ...p.toObject(),
+    updateCount: countMap.get(p._id.toString()) || 0,
+  }));
 };
 
 /**

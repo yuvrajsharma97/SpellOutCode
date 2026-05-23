@@ -47,15 +47,16 @@ export const projectSchema = z.object({
     .enum(["active", "paused", "completed", "archived"])
     .default("active"),
   techStack: z.string().optional(),
+  tags: z.string().optional(),
   githubUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   liveUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
 });
 
 export const updateSchema = z.object({
-  title: z.string().min(2),
-  summary: z.string().min(2),
-  content: z.string().min(1),
-  tags: z.array(z.string()).default([]),
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  summary: z.string().min(2, "Summary must be at least 2 characters"),
+  content: z.string().min(1, "Content is required"),
+  tag: z.string().optional(),
   published: z.boolean().default(false),
 });
 
@@ -66,10 +67,10 @@ export const profileSchema = z.object({
 });
 
 export const socialSchema = z.object({
-  github: z.string().optional(),
-  twitter: z.string().optional(),
-  linkedin: z.string().optional(),
-  website: z.string().optional(),
+  github: z.string().url("Enter a valid URL").or(z.literal("")).optional(),
+  twitter: z.string().url("Enter a valid URL").or(z.literal("")).optional(),
+  linkedin: z.string().url("Enter a valid URL").or(z.literal("")).optional(),
+  website: z.string().url("Enter a valid URL").or(z.literal("")).optional(),
 });
 
 export const contactSchema = z.object({

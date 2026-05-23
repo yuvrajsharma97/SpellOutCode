@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data) => {
     try {
-      await authApi.forgotPassword(data.email);
+      await authApi.forgotPassword(data);
       setSent(true);
     } catch {
       // Show success regardless to prevent email enumeration

@@ -29,8 +29,7 @@ import EmptyState from "../components/ui/EmptyState";
 export default function DashboardProjectsPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const { data, isLoading } = useMyProjects();
-  const projects = data?.projects || [];
+  const { data: projects = [], isLoading } = useMyProjects();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -61,6 +60,7 @@ export default function DashboardProjectsPage() {
       description: project.description || "",
       status: project.status,
       techStack: project.techStack?.join(", ") || "",
+      tags: project.tags?.join(", ") || "",
       githubUrl: project.githubUrl || "",
       liveUrl: project.liveUrl || "",
     });
@@ -71,6 +71,7 @@ export default function DashboardProjectsPage() {
     const payload = {
       ...data,
       techStack: parseTechStack(data.techStack),
+      tags: parseTechStack(data.tags),
     };
 
     try {
@@ -380,6 +381,17 @@ export default function DashboardProjectsPage() {
               />
             </FormField>
           </div>
+
+          <FormField
+            label="Tags"
+            error={errors.tags?.message}
+            hint="Comma-separated, e.g. open-source, api, side-project">
+            <TextInput
+              placeholder="open-source, api, side-project"
+              error={errors.tags?.message}
+              {...register("tags")}
+            />
+          </FormField>
 
           <div
             style={{

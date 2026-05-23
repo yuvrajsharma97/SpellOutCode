@@ -3,6 +3,7 @@ const {
   getProfile,
   updateProfile,
   updateAvatar,
+  removeAvatar,
 } = require("../controllers/profileController");
 const {
   getProjectsByUsername,
@@ -27,7 +28,8 @@ router.get("/:username/projects/:slug/updates/:updateId", getUpdateBySlugAndId);
 router.use(protect);
 
 //Protected  Routes
-router.patch("/me/updateProfile", updateProfile);  
+router.patch("/me/updateProfile", updateProfile);
 router.post("/me/avatar", upload.single("avatar"), updateAvatar);
+router.delete("/me/avatar", removeAvatar);
 
 module.exports = router;

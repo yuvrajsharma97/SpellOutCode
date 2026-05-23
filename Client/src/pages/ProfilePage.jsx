@@ -18,12 +18,12 @@ export default function ProfilePage() {
   const debouncedSearch = useDebounce(search, 250);
 
   const {
-    data: profileData,
+    data: profile,
     isLoading: profileLoading,
     isError: profileError,
   } = useProfile(username);
 
-  const { data: projectsData, isLoading: projectsLoading } =
+  const { data: projects = [], isLoading: projectsLoading } =
     usePublicProjects(username);
 
   if (profileError) {
@@ -40,9 +40,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  const profile = profileData?.user;
-  const projects = projectsData?.projects || [];
 
   const filtered = projects.filter((p) => {
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;

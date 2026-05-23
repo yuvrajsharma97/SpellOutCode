@@ -9,7 +9,7 @@ const createUpdate = async (userId, payload) => {
     throw new AppError("Project not found", 404);
   }
 
-  if (project.author.toString() !== userId) {
+  if (project.author.toString() !== userId.toString()) {
     throw new AppError("Unauthorized", 403);
   }
 
@@ -60,7 +60,7 @@ const editUpdate = async (id, userId, payload) => {
     throw new AppError("Update not found", 404);
   }
 
-  if (update.author.toString() !== userId) {
+  if (update.author.toString() !== userId.toString()) {
     throw new AppError("Unauthorized", 403);
   }
 
@@ -78,7 +78,7 @@ const deleteUpdate = async (id, userId) => {
     throw new AppError("Update not found", 404);
   }
 
-  if (update.author.toString() !== userId) {
+  if (update.author.toString() !== userId.toString()) {
     throw new AppError("Unauthorized", 403);
   }
 

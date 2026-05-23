@@ -26,10 +26,43 @@ const ProfileRail = ({ profile }) => {
 
         {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
 
+        {profile?.skills?.length > 0 && (
+          <div style={{ marginTop: "16px", marginBottom: "4px" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "10px",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--ink-4)",
+                marginBottom: "8px",
+              }}>
+              Skills
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+              {profile.skills.map((skill) => (
+                <span
+                  key={skill}
+                  style={{
+                    padding: "2px 8px",
+                    background: "var(--paper-3)",
+                    border: "1px solid var(--rule)",
+                    borderRadius: "2px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    color: "var(--ink-3)",
+                  }}>
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="profile-links">
           {profile?.socialLinks?.github && (
             <a
-              href={`https://github.com/${profile.socialLinks.github}`}
+              href={profile.socialLinks.github}
               target="_blank"
               rel="noreferrer">
               {/* <Github size={18} /> */}
@@ -47,7 +80,7 @@ const ProfileRail = ({ profile }) => {
 
           {profile?.socialLinks?.twitter && (
             <a
-              href={`https://twitter.com/${profile.socialLinks.twitter}`}
+              href={profile.socialLinks.twitter}
               target="_blank"
               rel="noreferrer">
               {/* <Twitter size={18} /> */}

@@ -21,7 +21,7 @@ export default function UpdateDetailPage() {
     updateId,
   );
 
-  const update = data?.update;
+  const update = data;
 
   if (isError) {
     return (
@@ -91,7 +91,7 @@ export default function UpdateDetailPage() {
         ) : update ? (
           <>
             {/* Tag */}
-            {update.tag && (
+            {update.tags?.[0] && (
               <div style={{ marginBottom: "16px" }}>
                 <span
                   style={{
@@ -101,9 +101,9 @@ export default function UpdateDetailPage() {
                     padding: "3px 9px",
                     borderRadius: "2px",
                     letterSpacing: "0.04em",
-                    ...(TAG_COLORS[update.tag] || TAG_COLORS.note),
+                    ...(TAG_COLORS[update.tags[0]] || TAG_COLORS.note),
                   }}>
-                  {update.tag}
+                  {update.tags[0]}
                 </span>
               </div>
             )}
@@ -176,7 +176,7 @@ export default function UpdateDetailPage() {
                 @{username}
               </Link>
             </MetaItem>
-            {update.tag && (
+            {update.tags?.[0] && (
               <MetaItem label="Tag">
                 <span
                   style={{
@@ -185,9 +185,9 @@ export default function UpdateDetailPage() {
                     fontSize: "10px",
                     padding: "2px 7px",
                     borderRadius: "2px",
-                    ...(TAG_COLORS[update.tag] || TAG_COLORS.note),
+                    ...(TAG_COLORS[update.tags[0]] || TAG_COLORS.note),
                   }}>
-                  {update.tag}
+                  {update.tags[0]}
                 </span>
               </MetaItem>
             )}

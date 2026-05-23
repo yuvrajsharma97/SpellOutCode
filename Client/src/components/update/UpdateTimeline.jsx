@@ -45,7 +45,7 @@ export default function UpdateTimeline({ updates, username, projectSlug }) {
               }}>
               {update.title}
             </div>
-            {update.preview && (
+            {update.summary && (
               <p
                 style={{
                   fontSize: "13px",
@@ -53,10 +53,10 @@ export default function UpdateTimeline({ updates, username, projectSlug }) {
                   lineHeight: 1.55,
                   fontWeight: 300,
                 }}>
-                {update.preview}
+                {update.summary}
               </p>
             )}
-            {update.tag && (
+            {update.tags?.[0] && (
               <span
                 style={{
                   display: "inline-block",
@@ -69,7 +69,7 @@ export default function UpdateTimeline({ updates, username, projectSlug }) {
                   marginTop: "8px",
                   letterSpacing: "0.02em",
                 }}>
-                {update.tag}
+                {update.tags[0]}
               </span>
             )}
           </div>

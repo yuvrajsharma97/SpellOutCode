@@ -10,8 +10,7 @@ import { formatRelativeDate } from "../utils/dates";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { data, isLoading } = useMyProjects();
-  const projects = data?.projects || [];
+  const { data: projects = [], isLoading } = useMyProjects();
 
   const hour = new Date().getHours();
   const greeting =

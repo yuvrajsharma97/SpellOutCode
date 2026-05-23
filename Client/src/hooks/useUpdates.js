@@ -7,6 +7,7 @@ export function usePublicUpdates(username, slug) {
     queryKey: queryKeys.updates(username, slug),
     queryFn: () => updatesApi.getByProject(username, slug),
     enabled: !!username && !!slug,
+    select: (res) => res?.data?.updates ?? [],
   });
 }
 
@@ -15,6 +16,7 @@ export function usePublicUpdate(username, slug, updateId) {
     queryKey: queryKeys.update(username, slug, updateId),
     queryFn: () => updatesApi.getById(username, slug, updateId),
     enabled: !!username && !!slug && !!updateId,
+    select: (res) => res?.data?.update ?? null,
   });
 }
 
@@ -23,6 +25,7 @@ export function useMyUpdates(projectId) {
     queryKey: queryKeys.myUpdates(projectId),
     queryFn: () => updatesApi.getByProjectId(projectId),
     enabled: !!projectId,
+    select: (res) => res?.data?.updates ?? [],
   });
 }
 

@@ -44,12 +44,15 @@ const updateAvatar = async (userId, fileBuffer, originalName) => {
     throw new AppError("User not found", 404);
   }
 
-  // Delete old avatar from ImageKit if one exists
-  if (user.avatar && user.avatar.fileId) {
-    await imageService.deleteImage(user.avatar.fileId);
+  // Attempt to delete old avatar — failure is non-blocking (stale/missing fileId)
+  if (user.avatar?.fileId) {
+    try {
+      await imageService.deleteImage(user.avatar.fileId);
+    } catch {
+      // continue with upload regardless
+    }
   }
 
-  // Build a clean filename: avatar-<username>.<ext>
   const ext = originalName.split(".").pop();
   const fileName = `avatar-${user.username}.${ext}`;
 
@@ -65,8 +68,33 @@ const updateAvatar = async (userId, fileBuffer, originalName) => {
   return user;
 };
 
+/**
+ * remove avatar (protected route)
+ */
+const removeAvatar = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (user.avatar?.fileId) {
+    try {
+      await imageService.deleteImage(user.avatar.fileId);
+    } catch {
+      // continue regardless
+    }
+  }
+
+  user.avatar = { url: "", fileId: "" };
+  await user.save();
+
+  return user;
+};
+
 module.exports = {
   getProfileByUsername,
   updateProfile,
   updateAvatar,
+  removeAvatar,
 };

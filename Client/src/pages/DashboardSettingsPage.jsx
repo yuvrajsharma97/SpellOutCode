@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { profilesApi } from "../api/profiles";
 import { authApi } from "../api/auth";
-import { profileSchema, changePasswordSchema } from "../schemas";
+import { profileSchema, socialSchema, changePasswordSchema } from "../schemas";
 import PageHeader from "../components/layout/PageHeader";
 import FormField, { TextInput, TextArea } from "../components/ui/FormField";
 import Button from "../components/ui/Button";
@@ -69,8 +69,10 @@ export default function DashboardSettingsPage() {
 }
 
 function ProfileTab() {
-  const { user, updateUser } = useAuth();
+  const { user, setUser } = useAuth();
   const { addToast } = useToast();
+  const [skills, setSkills] = useState(user?.skills || []);
+  const [skillInput, setSkillInput] = useState("");
 
   const {
     register,
@@ -85,10 +87,21 @@ function ProfileTab() {
     },
   });
 
+  const addSkill = () => {
+    const trimmed = skillInput.trim();
+    if (!trimmed || skills.includes(trimmed) || skills.length >= 20) return;
+    setSkills((prev) => [...prev, trimmed]);
+    setSkillInput("");
+  };
+
+  const removeSkill = (skill) => {
+    setSkills((prev) => prev.filter((s) => s !== skill));
+  };
+
   const onSubmit = async (data) => {
     try {
-      const res = await profilesApi.updateProfile(data);
-      updateUser(res.user);
+      const res = await profilesApi.updateProfile({ ...data, skills });
+      setUser(res.data.user);
       addToast({ message: "Profile updated." });
     } catch (err) {
       addToast({
@@ -118,7 +131,7 @@ function ProfileTab() {
       <FormField
         label="Bio"
         error={errors.bio?.message}
-        hint="Shown on your public profile. Max 400 characters.">
+        hint="Shown on your public profile. Max 300 characters.">
         <TextArea
           rows={4}
           placeholder="A short description of who you are and what you're building…"
@@ -127,7 +140,111 @@ function ProfileTab() {
         />
       </FormField>
 
-      <Button type="submit" isLoading={isSubmitting} disabled={!isDirty}>
+      {/* Skills */}
+      <div style={{ marginBottom: "24px" }}>
+        <label
+          style={{
+            display: "block",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            color: "var(--ink-3)",
+            marginBottom: "8px",
+          }}>
+          Skills
+        </label>
+
+        {/* Skill chips */}
+        {skills.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "3px 10px",
+                  background: "var(--paper-3)",
+                  border: "1px solid var(--rule)",
+                  borderRadius: "2px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11px",
+                  color: "var(--ink-2)",
+                }}>
+                {skill}
+                <button
+                  type="button"
+                  onClick={() => removeSkill(skill)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--ink-4)",
+                    padding: "0",
+                    lineHeight: 1,
+                    fontSize: "13px",
+                  }}>
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Skill input */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          <input
+            type="text"
+            value={skillInput}
+            onChange={(e) => setSkillInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addSkill();
+              }
+            }}
+            placeholder="e.g. React, Node.js…"
+            disabled={skills.length >= 20}
+            style={{
+              flex: 1,
+              padding: "8px 12px",
+              border: "1px solid var(--rule)",
+              borderRadius: "3px",
+              background: "var(--paper)",
+              color: "var(--ink)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "14px",
+              outline: "none",
+            }}
+          />
+          <button
+            type="button"
+            onClick={addSkill}
+            disabled={!skillInput.trim() || skills.length >= 20}
+            style={{
+              padding: "8px 14px",
+              border: "1px solid var(--rule)",
+              borderRadius: "3px",
+              background: "var(--paper-3)",
+              color: "var(--ink-3)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}>
+            Add
+          </button>
+        </div>
+        {skills.length >= 20 && (
+          <p style={{ fontSize: "12px", color: "var(--ink-4)", marginTop: "6px" }}>
+            Maximum 20 skills reached.
+          </p>
+        )}
+      </div>
+
+      <Button type="submit" isLoading={isSubmitting} disabled={!isDirty && skills.join() === (user?.skills || []).join()}>
         Save changes →
       </Button>
     </form>
@@ -153,7 +270,7 @@ function AvatarTab() {
 }
 
 function SocialTab() {
-  const { user, updateUser } = useAuth();
+  const { user, setUser } = useAuth();
   const { addToast } = useToast();
 
   const {
@@ -161,26 +278,19 @@ function SocialTab() {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
-    resolver: zodResolver(
-      profileSchema.pick({
-        website: true,
-        github: true,
-        twitter: true,
-        linkedin: true,
-      }),
-    ),
+    resolver: zodResolver(socialSchema),
     defaultValues: {
-      website: user?.website || "",
-      github: user?.github || "",
-      twitter: user?.twitter || "",
-      linkedin: user?.linkedin || "",
+      website: user?.socialLinks?.website || "",
+      github: user?.socialLinks?.github || "",
+      twitter: user?.socialLinks?.twitter || "",
+      linkedin: user?.socialLinks?.linkedin || "",
     },
   });
 
   const onSubmit = async (data) => {
     try {
-      const res = await profilesApi.updateProfile(data);
-      updateUser(res.user);
+      const res = await profilesApi.updateProfile({ socialLinks: data });
+      setUser(res.data.user);
       addToast({ message: "Social links updated." });
     } catch (err) {
       addToast({ message: err.message || "Failed to update.", type: "error" });
@@ -189,35 +299,35 @@ function SocialTab() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <FormField label="Website" error={errors.website?.message}>
+      <FormField label="GitHub" error={errors.github?.message}>
         <TextInput
-          placeholder="https://yoursite.com"
-          error={errors.website?.message}
-          {...register("website")}
-        />
-      </FormField>
-
-      <FormField label="GitHub username" error={errors.github?.message}>
-        <TextInput
-          placeholder="ammar"
+          placeholder="https://github.com/yourusername"
           error={errors.github?.message}
           {...register("github")}
         />
       </FormField>
 
-      <FormField label="Twitter / X handle" error={errors.twitter?.message}>
+      <FormField label="LinkedIn" error={errors.linkedin?.message}>
         <TextInput
-          placeholder="ammarkhalid"
+          placeholder="https://linkedin.com/in/yourusername"
+          error={errors.linkedin?.message}
+          {...register("linkedin")}
+        />
+      </FormField>
+
+      <FormField label="Twitter / X" error={errors.twitter?.message}>
+        <TextInput
+          placeholder="https://twitter.com/yourusername"
           error={errors.twitter?.message}
           {...register("twitter")}
         />
       </FormField>
 
-      <FormField label="LinkedIn username" error={errors.linkedin?.message}>
+      <FormField label="Website" error={errors.website?.message}>
         <TextInput
-          placeholder="ammar-khalid"
-          error={errors.linkedin?.message}
-          {...register("linkedin")}
+          placeholder="https://yoursite.com"
+          error={errors.website?.message}
+          {...register("website")}
         />
       </FormField>
 
