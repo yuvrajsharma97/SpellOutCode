@@ -130,7 +130,14 @@ const forgotPassword = async (email) => {
 
   const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-  await sendPasswordResetEmail(user.email, user.name, resetURL);
+  try {
+    await sendPasswordResetEmail(user.email, user.name, resetURL);
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new AppError("Failed to send reset email. Please try again.", 500);
+  }
 };
 
 const resetPassword = async (resetToken, newPassword) => {

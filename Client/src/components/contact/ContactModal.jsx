@@ -10,7 +10,7 @@ import Button from "../ui/Button";
 export default function ContactModal({
   isOpen,
   onClose,
-  username,
+  projectId,
   recipientName,
 }) {
   const { addToast } = useToast();
@@ -24,7 +24,7 @@ export default function ContactModal({
 
   const onSubmit = async (data) => {
     try {
-      await contactApi.send(username, data);
+      await contactApi.send(projectId, data);
       addToast({ message: "Message sent successfully.", type: "success" });
       reset();
       onClose();

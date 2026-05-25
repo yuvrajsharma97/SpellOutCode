@@ -1,15 +1,18 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Mail } from "lucide-react";
 import { usePublicProject } from "../hooks/useProjects";
 import { usePublicUpdates } from "../hooks/useUpdates";
 import StatusBadge from "../components/ui/StatusBadge";
 import UpdateTimeline from "../components/update/UpdateTimeline";
 import EmptyState from "../components/ui/EmptyState";
 import { SkeletonCard } from "../components/ui/LoadingSkeleton";
+import ContactModal from "../components/contact/ContactModal";
 import { formatDate } from "../utils/dates";
 
 export default function ProjectDetailPage() {
   const { username, slug } = useParams();
+  const [contactOpen, setContactOpen] = useState(false);
 
   const {
     data: projectData,
@@ -182,6 +185,27 @@ export default function ProjectDetailPage() {
                 Live demo
               </a>
             )}
+
+            <button
+              onClick={() => setContactOpen(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
+                color: "var(--ink-4)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                transition: "color var(--transition)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-4)")}>
+              <Mail size={12} />
+              Contact author
+            </button>
           </div>
 
           {/* Tech stack */}
@@ -240,6 +264,13 @@ export default function ProjectDetailPage() {
           projectSlug={slug}
         />
       )}
+
+      <ContactModal
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+        projectId={project?._id}
+        recipientName={project?.author?.name || username}
+      />
     </div>
   );
 }

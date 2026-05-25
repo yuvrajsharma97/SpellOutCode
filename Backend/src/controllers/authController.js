@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+const User = require("../models/user");
 const authService = require("../services/authServices");
 const {
   registerSchema,
@@ -124,6 +126,28 @@ const forgotPassword = async (req, res, next) => {
   }
 };
 
+const verifyResetToken = async (req, res, next) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    }).select("+passwordResetToken +passwordResetExpires");
+
+    if (!user) {
+      return next(new AppError("Reset link is invalid or has expired.", 400));
+    }
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const resetPassword = async (req, res, next) => {
   try {
     const parsed = resetPasswordSchema.safeParse(req.body);
@@ -168,6 +192,7 @@ module.exports = {
   logout,
   refresh,
   forgotPassword,
+  verifyResetToken,
   resetPassword,
   getMe,
   changePassword,

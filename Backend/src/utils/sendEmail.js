@@ -1,18 +1,20 @@
-const transporter  = require("../config/email");
+const resend = require("../config/email");
 
+const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
-const sendEmail = async (to, subject, text, html) => {
-  try {
-    const info = await transporter.sendMail({
-      from: `"Spell Out Code" <${process.env.EMAIL_USER}>`, // sender address
-      to, // list of receivers
-      subject, // Subject line
-      html, // html body
-    });
-    console.log("Email sent:", info.messageId);
-  } catch (error) {
-    console.error("Error sending email:", error);
+const sendEmail = async (to, subject, html) => {
+  const { data, error } = await resend.emails.send({
+    from: `Spell Out Code <${FROM_ADDRESS}>`,
+    to,
+    subject,
+    html,
+  });
+
+  if (error) {
+    throw new Error(`Email send failed: ${error.message}`);
   }
+
+  return data;
 };
 
 module.exports = sendEmail;
