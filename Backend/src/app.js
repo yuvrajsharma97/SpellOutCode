@@ -57,11 +57,8 @@ app.use(express.json({ limit: "10kb" }));
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  mongoSanitize({
-    replaceWith: "_",
-  }),
-);
+// express-mongo-sanitize v2.2.0 is incompatible with Express 5 (req.query is read-only)
+// app.use(mongoSanitize({ replaceWith: "_" }));
 
 app.use(cookieParser());
 
