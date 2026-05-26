@@ -23,6 +23,7 @@ const updateSchema = new mongoose.Schema(
       type: String,
       required: [true, "Content is required"],
       trim: true,
+      maxlength: [50000, "Content cannot exceed 50,000 characters"],
     },
     coverImage: {
       url: { type: String, default: "" },

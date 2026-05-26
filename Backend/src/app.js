@@ -36,15 +36,30 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again in 15 minutes.",
+  },
+});
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+app.use("/api/auth/reset-password", authLimiter);
+
 app.use(express.json({ limit: "10kb" }));
 
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(
-//   mongoSanitize({
-//     replaceWith: "_",
-//   }),
-// );
+app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  }),
+);
 
 app.use(cookieParser());
 
@@ -56,10 +71,9 @@ if (process.env.NODE_ENV === "development") {
  * Routes
  */
 
-// Test route
-// app.get("/api/health", (req, res) => {
-//   res.json({ success: true, message: "Server is running" });
-// });
+app.get("/api/health", (req, res) => {
+  res.json({ success: true, message: "Server is running" });
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);

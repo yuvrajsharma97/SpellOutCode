@@ -1,6 +1,8 @@
-const dns = require("dns");
-dns.setServers(["8.8.8.8"]);
 require("dotenv").config();
+if (process.env.NODE_ENV === "production") {
+  const dns = require("dns");
+  dns.setServers(["8.8.8.8"]);
+}
 const app = require("./src/app");
 const connectDB = require("./src/config/db");
 
