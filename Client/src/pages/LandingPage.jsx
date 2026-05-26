@@ -133,32 +133,6 @@ export default function LandingPage() {
           >
             Create your archive
           </Link>
-          <Link
-            to="/ammar"
-            style={{
-              display: 'inline-block',
-              padding: '10px 22px',
-              background: 'transparent',
-              color: 'var(--ink-3)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
-              border: '1px solid var(--rule)',
-              borderRadius: '4px',
-              textDecoration: 'none',
-              letterSpacing: '0.03em',
-              transition: 'all var(--transition)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--ink)';
-              e.currentTarget.style.borderColor = 'var(--ink-4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--ink-3)';
-              e.currentTarget.style.borderColor = 'var(--rule)';
-            }}
-          >
-            Explore example profile →
-          </Link>
         </div>
       </section>
 
