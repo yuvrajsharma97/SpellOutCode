@@ -47,6 +47,9 @@ export default function Modal({
           maxWidth: width,
           boxShadow: "0 8px 40px rgba(20, 18, 16, 0.12)",
           animation: "fadeUp 0.2s ease",
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "calc(100vh - 48px)",
         }}>
         {/* Header */}
         <div
@@ -88,7 +91,7 @@ export default function Modal({
         </div>
 
         {/* Body */}
-        <div style={{ padding: "24px" }}>{children}</div>
+        <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>{children}</div>
       </div>
     </div>
   );
