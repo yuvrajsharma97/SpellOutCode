@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import PublicLayout from "../components/layout/PublicLayout";
 import AuthLayout from "../components/layout/AuthLayout";
 import DashboardLayout from "../components/layout/DashboardLayout";
-import ProtectedRoute from "../routes/ProtectedRoute";
+import ProtectedRoute from "../routes/Protectedroute";
 
 import LandingPage from "../pages/LandingPage";
 import ProfilePage from "../pages/ProfilePage";
