@@ -1,6 +1,7 @@
 const profileService = require("../services/profileServices");
 const { updateProfileSchema } = require("../validators/profileValidator");
 const AppError = require("../utils/appError");
+const { clearAuthCookies } = require("../utils/cookieHelpers");
 
 
 
@@ -95,4 +96,14 @@ const removeAvatar = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar };
+const deleteAccount = async (req, res, next) => {
+  try {
+    await profileService.deleteAccount(req.user.id);
+    clearAuthCookies(res);
+    res.status(200).json({ success: true, message: "Account deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar, deleteAccount };

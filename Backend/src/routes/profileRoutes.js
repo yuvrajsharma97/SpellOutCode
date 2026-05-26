@@ -4,6 +4,7 @@ const {
   updateProfile,
   updateAvatar,
   removeAvatar,
+  deleteAccount,
 } = require("../controllers/profileController");
 const {
   getProjectsByUsername,
@@ -31,5 +32,6 @@ router.use(protect);
 router.patch("/me/updateProfile", updateProfile);
 router.post("/me/avatar", upload.single("avatar"), updateAvatar);
 router.delete("/me/avatar", removeAvatar);
+router.delete("/me", deleteAccount);
 
 module.exports = router;

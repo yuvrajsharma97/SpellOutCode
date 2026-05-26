@@ -8,4 +8,5 @@ export const profilesApi = {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   removeAvatar: () => api.delete("/users/me/avatar"),
+  deleteAccount: () => api.delete("/users/me"),
 };

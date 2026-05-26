@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { profilesApi } from "../api/profiles";
@@ -339,7 +340,12 @@ function SocialTab() {
 }
 
 function SecurityTab() {
+  const { user, logout } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [confirmUsername, setConfirmUsername] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const {
     register,
@@ -364,80 +370,174 @@ function SecurityTab() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await profilesApi.deleteAccount();
+      await logout();
+      navigate("/");
+    } catch (err) {
+      addToast({ message: err.message || "Failed to delete account.", type: "error" });
+      setDeleting(false);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <FormField
-        label="Current password"
-        error={errors.currentPassword?.message}>
-        <TextInput
-          type="password"
-          placeholder="••••••••"
-          error={errors.currentPassword?.message}
-          autoComplete="current-password"
-          {...register("currentPassword")}
-        />
-      </FormField>
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <FormField
+          label="Current password"
+          error={errors.currentPassword?.message}>
+          <TextInput
+            type="password"
+            placeholder="••••••••"
+            error={errors.currentPassword?.message}
+            autoComplete="current-password"
+            {...register("currentPassword")}
+          />
+        </FormField>
 
-      <FormField label="New password" error={errors.newPassword?.message}>
-        <TextInput
-          type="password"
-          placeholder="••••••••"
-          error={errors.newPassword?.message}
-          autoComplete="new-password"
-          {...register("newPassword")}
-        />
-      </FormField>
+        <FormField label="New password" error={errors.newPassword?.message}>
+          <TextInput
+            type="password"
+            placeholder="••••••••"
+            error={errors.newPassword?.message}
+            autoComplete="new-password"
+            {...register("newPassword")}
+          />
+        </FormField>
 
-      <FormField
-        label="Confirm new password"
-        error={errors.confirmPassword?.message}>
-        <TextInput
-          type="password"
-          placeholder="••••••••"
-          error={errors.confirmPassword?.message}
-          autoComplete="new-password"
-          {...register("confirmPassword")}
-        />
-      </FormField>
+        <FormField
+          label="Confirm new password"
+          error={errors.confirmPassword?.message}>
+          <TextInput
+            type="password"
+            placeholder="••••••••"
+            error={errors.confirmPassword?.message}
+            autoComplete="new-password"
+            {...register("confirmPassword")}
+          />
+        </FormField>
 
-      <Button type="submit" isLoading={isSubmitting}>
-        Change password →
-      </Button>
+        <Button type="submit" isLoading={isSubmitting}>
+          Change password →
+        </Button>
 
-      <div
-        style={{
-          marginTop: "48px",
-          paddingTop: "32px",
-          borderTop: "1px solid var(--rule)",
-        }}>
         <div
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            color: "var(--ink-4)",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            marginBottom: "12px",
+            marginTop: "48px",
+            paddingTop: "32px",
+            borderTop: "1px solid var(--rule)",
           }}>
-          Danger zone
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              color: "var(--ink-4)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              marginBottom: "12px",
+            }}>
+            Danger zone
+          </div>
+          <p
+            style={{
+              fontSize: "13px",
+              color: "var(--ink-4)",
+              marginBottom: "16px",
+              fontWeight: 300,
+            }}>
+            Deleting your account will permanently remove your profile, all
+            projects, and all updates. This cannot be undone.
+          </p>
+          <Button variant="danger" size="sm" type="button" onClick={() => setDeleteOpen(true)}>
+            Delete account
+          </Button>
         </div>
-        <p
+      </form>
+
+      {deleteOpen && (
+        <div
           style={{
-            fontSize: "13px",
-            color: "var(--ink-4)",
-            marginBottom: "16px",
-            fontWeight: 300,
-          }}>
-          Deleting your account will permanently remove your profile, all
-          projects, and all updates. This cannot be undone.
-        </p>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={() => alert("Contact support to delete your account.")}>
-          Delete account
-        </Button>
-      </div>
-    </form>
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => { if (!deleting) setDeleteOpen(false); }}>
+          <div
+            style={{
+              background: "var(--paper)",
+              border: "1px solid var(--rule)",
+              borderRadius: "4px",
+              padding: "32px",
+              width: "100%",
+              maxWidth: "400px",
+              margin: "0 16px",
+            }}
+            onClick={(e) => e.stopPropagation()}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
+                color: "var(--danger)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                marginBottom: "12px",
+              }}>
+              Delete account
+            </div>
+            <p style={{ fontSize: "14px", color: "var(--ink)", marginBottom: "8px", fontWeight: 400 }}>
+              This will permanently delete your account, all projects, and all updates.
+            </p>
+            <p style={{ fontSize: "13px", color: "var(--ink-4)", marginBottom: "24px", fontWeight: 300 }}>
+              Type <strong style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)" }}>{user?.username}</strong> to confirm.
+            </p>
+            <input
+              type="text"
+              value={confirmUsername}
+              onChange={(e) => setConfirmUsername(e.target.value)}
+              placeholder={user?.username}
+              disabled={deleting}
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                border: "1px solid var(--rule)",
+                borderRadius: "3px",
+                background: "var(--paper)",
+                color: "var(--ink)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "13px",
+                outline: "none",
+                marginBottom: "20px",
+                boxSizing: "border-box",
+              }}
+            />
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => { setDeleteOpen(false); setConfirmUsername(""); }}
+                disabled={deleting}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                isLoading={deleting}
+                disabled={confirmUsername !== user?.username || deleting}
+                onClick={handleDeleteAccount}>
+                Delete my account
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
