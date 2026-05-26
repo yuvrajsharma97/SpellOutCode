@@ -1,7 +1,9 @@
+const IS_PROD = process.env.NODE_ENV === "production";
+
 const BASE_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  secure: IS_PROD,
+  sameSite: IS_PROD ? "none" : "strict",
 };
 
 const setAuthCookies = (res, accessToken, refreshToken) => {
