@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import { useSessionExpiry } from "../../hooks/useSessionExpiry";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -22,6 +23,7 @@ const ACCOUNT_ITEMS = [
 ];
 
 export default function DashboardLayout() {
+  useSessionExpiry();
   const { user, logout } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
