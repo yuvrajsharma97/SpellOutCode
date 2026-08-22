@@ -13,7 +13,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/dashboard/projects", label: "Projects", icon: FolderOpen },
 ];
 
@@ -102,172 +102,46 @@ export default function DashboardLayout() {
           />
           SpellOutCode
         </NavLink>
-
-        {user && (
-          <a
-            href={`/${user.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex"
-            style={{
-              alignItems: "center",
-              gap: "5px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              color: "var(--ink-4)",
-              transition: "color var(--transition)",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "var(--ink-4)")
-            }>
-            /{user.username}
-            <ExternalLink size={11} />
-          </a>
-        )}
       </header>
 
       <div className="flex flex-1 relative">
-        {/* Mobile backdrop */}
-        {mobileNavOpen && (
-          <div
-            onClick={() => setMobileNavOpen(false)}
-            className="fixed inset-0 md:hidden"
-            style={{ background: "rgba(20, 18, 16, 0.4)", zIndex: 90 }}
-          />
-        )}
-
-        {/* Sidebar — off-canvas drawer on mobile, static column on desktop */}
+        {/* Desktop sidebar — always in the document at md+, absent below it */}
         <aside
-          className={`fixed md:sticky top-[52px] md:top-[52px] left-0 h-[calc(100vh-52px)] w-[220px] md:w-[200px] flex flex-col transition-transform duration-200 ${
-            mobileNavOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0`}
+          className="hidden md:flex md:flex-col md:sticky md:w-[200px]"
           style={{
+            top: "52px",
+            height: "calc(100vh - 52px)",
             borderRight: "1px solid var(--rule)",
             background: "var(--paper-2)",
             padding: "28px 0",
-            zIndex: 95,
           }}>
-          <nav
-            style={{
-              flex: 1,
-              padding: "0 12px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "2px",
-            }}>
-            <SidebarSection label="Workspace">
-              {NAV_ITEMS.map((item) => (
-                <SidebarItem key={item.to} {...item} />
-              ))}
-            </SidebarSection>
-
-            <SidebarSection label="Account" style={{ marginTop: "auto" }}>
-              {ACCOUNT_ITEMS.map((item) => (
-                <SidebarItem key={item.to} {...item} />
-              ))}
-            </SidebarSection>
-          </nav>
-
-          {/* User + Logout */}
-          {user && (
-            <div
-              style={{
-                padding: "16px 16px 0",
-                borderTop: "1px solid var(--rule)",
-                marginTop: "16px",
-              }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "12px",
-                }}>
-                {user.avatar?.url ? (
-                  <img
-                    src={user.avatar.url}
-                    alt={user.name}
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "4px",
-                      objectFit: "cover",
-                      flexShrink: 0,
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "4px",
-                      background: "var(--ink)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "11px",
-                      color: "var(--paper)",
-                      fontWeight: 500,
-                      flexShrink: 0,
-                    }}>
-                    {user.name?.slice(0, 2).toUpperCase() ||
-                      user.username?.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 500,
-                      color: "var(--ink)",
-                      lineHeight: 1.3,
-                    }}>
-                    {user.name}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "10px",
-                      color: "var(--ink-4)",
-                    }}>
-                    @{user.username}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "6px 8px",
-                  borderRadius: "4px",
-                  border: "none",
-                  background: "transparent",
-                  fontSize: "12px",
-                  color: "var(--ink-4)",
-                  cursor: "pointer",
-                  fontFamily: "var(--font-sans)",
-                  transition: "all var(--transition)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "var(--paper-3)";
-                  e.currentTarget.style.color = "var(--danger)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "var(--ink-4)";
-                }}>
-                <LogOut size={13} />
-                Sign out
-              </button>
-            </div>
-          )}
+          <SidebarContent user={user} onLogout={handleLogout} />
         </aside>
+
+        {/* Mobile drawer — only mounted while open, so there's no hidden/mispositioned copy to fight with */}
+        {mobileNavOpen && (
+          <>
+            <div
+              onClick={() => setMobileNavOpen(false)}
+              className="fixed inset-0 md:hidden"
+              style={{ background: "rgba(20, 18, 16, 0.4)", zIndex: 90 }}
+            />
+            <aside
+              className="fixed md:hidden flex flex-col"
+              style={{
+                top: "52px",
+                left: 0,
+                width: "220px",
+                height: "calc(100vh - 52px)",
+                borderRight: "1px solid var(--rule)",
+                background: "var(--paper-2)",
+                padding: "28px 0",
+                zIndex: 95,
+              }}>
+              <SidebarContent user={user} onLogout={handleLogout} />
+            </aside>
+          </>
+        )}
 
         {/* Main */}
         <main
@@ -277,6 +151,160 @@ export default function DashboardLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+function SidebarContent({ user, onLogout }) {
+  return (
+    <>
+      <nav
+        style={{
+          flex: 1,
+          padding: "0 12px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2px",
+        }}>
+        <SidebarSection label="Workspace">
+          {NAV_ITEMS.map((item) => (
+            <SidebarItem key={item.to} {...item} />
+          ))}
+        </SidebarSection>
+
+        <SidebarSection label="Account" style={{ marginTop: "auto" }}>
+          {ACCOUNT_ITEMS.map((item) => (
+            <SidebarItem key={item.to} {...item} />
+          ))}
+          {user && (
+            <a
+              href={`/${user.username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                padding: "7px 8px",
+                borderRadius: "4px",
+                fontSize: "13px",
+                color: "var(--ink-3)",
+                textDecoration: "none",
+                transition: "all 0.12s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--paper-3)";
+                e.currentTarget.style.color = "var(--ink)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "var(--ink-3)";
+              }}>
+              <ExternalLink size={14} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
+              View public profile
+            </a>
+          )}
+        </SidebarSection>
+      </nav>
+
+      {/* User + Logout */}
+      {user && (
+        <div
+          style={{
+            padding: "16px 16px 0",
+            borderTop: "1px solid var(--rule)",
+            marginTop: "16px",
+          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "12px",
+            }}>
+            {user.avatar?.url ? (
+              <img
+                src={user.avatar.url}
+                alt={user.name}
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "4px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "4px",
+                  background: "var(--ink)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11px",
+                  color: "var(--paper)",
+                  fontWeight: 500,
+                  flexShrink: 0,
+                }}>
+                {user.name?.slice(0, 2).toUpperCase() ||
+                  user.username?.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+            <div>
+              <div
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: "var(--ink)",
+                  lineHeight: 1.3,
+                }}>
+                {user.name}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "10px",
+                  color: "var(--ink-4)",
+                }}>
+                @{user.username}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={onLogout}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 8px",
+              borderRadius: "4px",
+              border: "none",
+              background: "transparent",
+              fontSize: "12px",
+              color: "var(--ink-4)",
+              cursor: "pointer",
+              fontFamily: "var(--font-sans)",
+              transition: "all var(--transition)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--paper-3)";
+              e.currentTarget.style.color = "var(--danger)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "var(--ink-4)";
+            }}>
+            <LogOut size={13} />
+            Sign out
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 

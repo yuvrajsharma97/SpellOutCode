@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { loginSchema } from "../schemas";
-import FormField, { TextInput } from "../components/ui/FormField";
+import FormField, { TextInput, PasswordInput } from "../components/ui/FormField";
 import Button from "../components/ui/Button";
 
 export default function LoginPage() {
@@ -72,8 +72,7 @@ export default function LoginPage() {
         </FormField>
 
         <FormField label="Password" error={errors.password?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.password?.message}
             autoComplete="current-password"

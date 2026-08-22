@@ -207,6 +207,12 @@ a {
   margin: 2rem 0;
 }
 
+/* ── Spinner ── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ── Skeleton Animation ── */
 @keyframes shimmer {
   0%, 100% { opacity: 1; }

@@ -5,7 +5,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { authApi } from "../api/auth";
 import { useToast } from "../context/ToastContext";
 import { resetPasswordSchema } from "../schemas";
-import FormField, { TextInput } from "../components/ui/FormField";
+import FormField, { TextInput, PasswordInput } from "../components/ui/FormField";
 import Button from "../components/ui/Button";
 
 export default function ResetPasswordPage() {
@@ -166,8 +166,7 @@ export default function ResetPasswordPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormField label="New password" error={errors.password?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.password?.message}
             autoComplete="new-password"
@@ -178,8 +177,7 @@ export default function ResetPasswordPage() {
         <FormField
           label="Confirm password"
           error={errors.confirmPassword?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
             autoComplete="new-password"

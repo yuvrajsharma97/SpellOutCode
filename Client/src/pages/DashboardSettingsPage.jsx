@@ -8,7 +8,7 @@ import { profilesApi } from "../api/profiles";
 import { authApi } from "../api/auth";
 import { profileSchema, socialSchema, changePasswordSchema } from "../schemas";
 import PageHeader from "../components/layout/PageHeader";
-import FormField, { TextInput, TextArea } from "../components/ui/FormField";
+import FormField, { TextInput, TextArea, PasswordInput } from "../components/ui/FormField";
 import Button from "../components/ui/Button";
 import AvatarUploader from "../components/profile/AvatarUploader";
 
@@ -388,8 +388,7 @@ function SecurityTab() {
         <FormField
           label="Current password"
           error={errors.currentPassword?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.currentPassword?.message}
             autoComplete="current-password"
@@ -398,8 +397,7 @@ function SecurityTab() {
         </FormField>
 
         <FormField label="New password" error={errors.newPassword?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.newPassword?.message}
             autoComplete="new-password"
@@ -410,8 +408,7 @@ function SecurityTab() {
         <FormField
           label="Confirm new password"
           error={errors.confirmPassword?.message}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
             autoComplete="new-password"

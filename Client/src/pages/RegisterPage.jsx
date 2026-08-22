@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { registerSchema } from "../schemas";
-import FormField, { TextInput } from "../components/ui/FormField";
+import FormField, { TextInput, PasswordInput } from "../components/ui/FormField";
 import Button from "../components/ui/Button";
 
 export default function RegisterPage() {
@@ -104,8 +104,7 @@ export default function RegisterPage() {
           label="Password"
           error={errors.password?.message}
           hint={!errors.password ? "Minimum 8 characters" : undefined}>
-          <TextInput
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             error={errors.password?.message}
             autoComplete="new-password"

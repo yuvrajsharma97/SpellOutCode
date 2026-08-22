@@ -37,7 +37,7 @@ export default function Modal({
         if (dismissible && e.target === e.currentTarget) onClose();
       }}>
       <div
-        className="max-h-[calc(100vh-24px)] sm:max-h-[calc(100vh-48px)]"
+        className="max-h-[calc(100vh_-_24px)] sm:max-h-[calc(100vh_-_48px)]"
         style={{
           background: "var(--paper)",
           borderRadius: "8px",

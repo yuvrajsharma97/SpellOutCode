@@ -72,18 +72,15 @@ export default function ProfilePage() {
       <main>
         {/* Projects header */}
         <div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
             marginBottom: "20px",
             paddingBottom: "16px",
             borderBottom: "1px solid var(--rule)",
-            gap: "16px",
-            flexWrap: "wrap",
           }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div className="flex items-center gap-4 min-w-0">
             <span
+              className="flex-shrink-0"
               style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
@@ -95,12 +92,13 @@ export default function ProfilePage() {
               {!projectsLoading && ` — ${projects.length}`}
             </span>
 
-            {/* Status filter pills */}
-            <div style={{ display: "flex", gap: "4px" }}>
+            {/* Status filter pills — horizontally scrollable so they never overflow the viewport */}
+            <div className="flex gap-1 overflow-x-auto">
               {STATUS_FILTERS.map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
+                  className="flex-shrink-0 whitespace-nowrap"
                   style={{
                     padding: "3px 10px",
                     borderRadius: "2px",
@@ -122,7 +120,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="w-full sm:w-[190px]">
+          <div className="w-full sm:w-[190px] flex-shrink-0">
             <SearchInput
               value={search}
               onChange={setSearch}
