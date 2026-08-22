@@ -135,10 +135,10 @@ export default function DashboardProjectsPage() {
         />
       ) : (
         <div>
-          {/* Table head */}
+          {/* Table head — desktop only */}
           <div
+            className="hidden md:grid"
             style={{
-              display: "grid",
               gridTemplateColumns: "1fr 100px 70px 100px 120px",
               gap: "12px",
               padding: "8px 0",
@@ -159,13 +159,10 @@ export default function DashboardProjectsPage() {
           {projects.map((project) => (
             <div
               key={project._id}
+              className="flex flex-col gap-3 py-4 md:grid md:gap-3 md:py-3.5 md:items-center"
               style={{
-                display: "grid",
                 gridTemplateColumns: "1fr 100px 70px 100px 120px",
-                gap: "12px",
-                padding: "14px 0",
                 borderBottom: "1px solid var(--rule)",
-                alignItems: "center",
               }}>
               <div>
                 <div
@@ -192,32 +189,35 @@ export default function DashboardProjectsPage() {
                   </div>
                 )}
               </div>
-              <div>
-                <StatusBadge status={project.status} />
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "11px",
-                  color: "var(--ink-4)",
-                }}>
-                {project.updateCount || 0}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "11px",
-                  color: "var(--ink-4)",
-                }}>
-                {formatRelativeDate(project.updatedAt)}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "6px",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                }}>
+
+              {/* Status / updates / date / actions — wraps as a row on mobile, becomes grid columns on desktop */}
+              <div className="flex flex-wrap items-center gap-3 md:contents">
+                <div>
+                  <StatusBadge status={project.status} />
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    color: "var(--ink-4)",
+                  }}>
+                  {project.updateCount || 0}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    color: "var(--ink-4)",
+                  }}>
+                  {formatRelativeDate(project.updatedAt)}
+                </div>
+                <div
+                  className="md:justify-end"
+                  style={{
+                    display: "flex",
+                    gap: "6px",
+                    alignItems: "center",
+                  }}>
                 <Link
                   to={`/dashboard/projects/${project._id}/updates`}
                   title="Manage updates"
@@ -312,6 +312,7 @@ export default function DashboardProjectsPage() {
                   }}>
                   <Trash2 size={14} />
                 </button>
+                </div>
               </div>
             </div>
           ))}
@@ -323,7 +324,8 @@ export default function DashboardProjectsPage() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         title={editingProject ? "Edit project" : "New project"}
-        width="520px">
+        width="520px"
+        dismissible={false}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormField label="Title" error={errors.title?.message}>
             <TextInput
@@ -353,12 +355,7 @@ export default function DashboardProjectsPage() {
             />
           </FormField>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
-            }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Status" error={errors.status?.message}>
               <SelectInput
                 error={errors.status?.message}
@@ -393,12 +390,7 @@ export default function DashboardProjectsPage() {
             />
           </FormField>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
-            }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="GitHub URL" error={errors.githubUrl?.message}>
               <TextInput
                 placeholder="https://github.com/…"

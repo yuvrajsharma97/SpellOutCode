@@ -40,13 +40,10 @@ export default function UpdateDetailPage() {
 
   return (
     <div
+      className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-10 md:gap-20 px-4 py-8 sm:px-8 sm:py-10 md:py-12"
       style={{
         maxWidth: "1040px",
         margin: "0 auto",
-        padding: "48px 32px",
-        display: "grid",
-        gridTemplateColumns: "1fr 220px",
-        gap: "80px",
         alignItems: "start",
       }}>
       {/* Main content */}
@@ -130,12 +127,10 @@ export default function UpdateDetailPage() {
 
       {/* Sticky metadata sidebar */}
       <aside
+        className="pt-8 border-t md:pt-0 md:border-t-0 md:border-l md:pl-8 md:sticky md:top-20"
         style={{
-          position: "sticky",
-          top: "80px",
           alignSelf: "start",
-          borderLeft: "1px solid var(--rule)",
-          paddingLeft: "32px",
+          borderColor: "var(--rule)",
         }}>
         {isLoading ? (
           <LoadingSkeleton lines={4} />

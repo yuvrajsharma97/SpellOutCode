@@ -1,23 +1,31 @@
 const AppError = require("../utils/appError");
 
-const handleCastError = (err) => new AppError(`Invalid ${err.path}`, 400);
+const FRIENDLY_DUPLICATE_FIELDS = {
+  email: "This email is already registered.",
+  username: "This username is already taken.",
+};
+
+const handleCastError = () =>
+  new AppError("We couldn't find what you were looking for.", 404);
 
 const handleDuplicateFields = (err) => {
   const field = Object.keys(err.keyValue)[0];
-  return new AppError(`${field} already exists`, 400);
+  return new AppError(
+    FRIENDLY_DUPLICATE_FIELDS[field] || `This ${field} is already in use.`,
+    409,
+  );
 };
 
 const handleValidationError = (err) => {
-  const errors = Object.values(err.errors).map((el) => el.message);
-
-  return new AppError(errors.join(", "), 400);
+  const [firstError] = Object.values(err.errors);
+  return new AppError(firstError.message, 400);
 };
 
 const handleJWTExpired = () =>
-  new AppError("Session expired. Please log in again.", 401);
+  new AppError("Your session has expired. Please log in again.", 401);
 
 const handleJWTInvalid = () =>
-  new AppError("Invalid authentication token.", 401);
+  new AppError("Your session isn't valid. Please log in again.", 401);
 
 const errorHandler = (err, req, res, next) => {
   let error = err;
@@ -46,7 +54,7 @@ const errorHandler = (err, req, res, next) => {
 
   return res.status(500).json({
     success: false,
-    message: "Something went wrong",
+    message: "Something went wrong on our end. Please try again in a moment.",
   });
 };
 

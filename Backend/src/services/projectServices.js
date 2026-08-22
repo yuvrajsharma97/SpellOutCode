@@ -47,7 +47,7 @@ const getProjectsByUser = async (userId) => {
   const user = await User.findOne({ _id: userId });
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError("We couldn't find that user.", 404);
   }
 
   const projects = await Project.find({ author: user._id })
@@ -72,7 +72,7 @@ const getProjectsByUser = async (userId) => {
  */
 const getProjectsByUsername = async (username) => {
   const user = await User.findOne({ username });
-  if (!user) throw new AppError("User not found", 404);
+  if (!user) throw new AppError("We couldn't find that user.", 404);
 
   const projects = await Project.find({ author: user._id })
     .populate("author", "name username avatar roleTitle")
@@ -101,7 +101,7 @@ const getProjectBySlug = async (slug) => {
   );
 
   if (!project) {
-    throw new AppError("Project not found", 404);
+    throw new AppError("This project could not be found.", 404);
   }
 
   return project;
@@ -114,12 +114,12 @@ const updateProject = async (projectId, userId, data) => {
   const project = await Project.findById(projectId);
 
   if (!project) {
-    throw new AppError("Project not found", 404);
+    throw new AppError("This project could not be found.", 404);
   }
 
   // Ownership check — compare as strings since ObjectId !== ObjectId by reference
   if (project.author.toString() !== userId.toString()) {
-    throw new AppError("You are not authorized to update this project", 403);
+    throw new AppError("You don't have permission to edit this project.", 403);
   }
 
   // Regenerate slug if title changed
@@ -143,11 +143,11 @@ const deleteProject = async (projectId, userId) => {
   const project = await Project.findById(projectId);
 
   if (!project) {
-    throw new AppError("Project not found", 404);
+    throw new AppError("This project could not be found.", 404);
   }
 
   if (project.author.toString() !== userId.toString()) {
-    throw new AppError("You are not authorized to delete this project", 403);
+    throw new AppError("You don't have permission to delete this project.", 403);
   }
 
   await Update.deleteMany({ project: projectId });

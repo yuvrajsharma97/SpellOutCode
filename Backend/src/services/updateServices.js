@@ -6,11 +6,11 @@ const createUpdate = async (userId, payload) => {
   const project = await Project.findById(payload.project);
 
   if (!project) {
-    throw new AppError("Project not found", 404);
+    throw new AppError("This project could not be found.", 404);
   }
 
   if (project.author.toString() !== userId.toString()) {
-    throw new AppError("Unauthorized", 403);
+    throw new AppError("You don't have permission to do that.", 403);
   }
 
   const update = await Update.create({
@@ -47,7 +47,7 @@ const getUpdateById = async (id, publishedOnly = true) => {
   );
 
   if (!update) {
-    throw new AppError("Update not found", 404);
+    throw new AppError("This update could not be found.", 404);
   }
 
   return update;
@@ -57,11 +57,11 @@ const editUpdate = async (id, userId, payload) => {
   const update = await Update.findById(id);
 
   if (!update) {
-    throw new AppError("Update not found", 404);
+    throw new AppError("This update could not be found.", 404);
   }
 
   if (update.author.toString() !== userId.toString()) {
-    throw new AppError("Unauthorized", 403);
+    throw new AppError("You don't have permission to do that.", 403);
   }
 
   Object.assign(update, payload);
@@ -75,11 +75,11 @@ const deleteUpdate = async (id, userId) => {
   const update = await Update.findById(id);
 
   if (!update) {
-    throw new AppError("Update not found", 404);
+    throw new AppError("This update could not be found.", 404);
   }
 
   if (update.author.toString() !== userId.toString()) {
-    throw new AppError("Unauthorized", 403);
+    throw new AppError("You don't have permission to do that.", 403);
   }
 
   await update.deleteOne();

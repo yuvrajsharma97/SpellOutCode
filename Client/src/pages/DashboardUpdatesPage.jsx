@@ -172,15 +172,12 @@ export default function DashboardUpdatesPage() {
           {updates.map((update, idx) => (
             <div
               key={update._id}
+              className="flex flex-col gap-2 py-4 md:grid md:gap-6 md:py-[18px] md:items-start"
               style={{
-                display: "grid",
                 gridTemplateColumns: "120px 1fr auto",
-                gap: "24px",
-                padding: "18px 0",
                 borderTop: "1px solid var(--rule)",
-                alignItems: "start",
               }}>
-              <div style={{ paddingTop: "2px" }}>
+              <div style={{ paddingTop: "2px" }} className="flex items-center gap-2 md:block">
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
@@ -309,14 +306,10 @@ export default function DashboardUpdatesPage() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         title={editingUpdate ? "Edit update" : "New update"}
-        width="680px">
+        width="680px"
+        dismissible={false}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 160px",
-              gap: "16px",
-            }}>
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-4">
             <FormField label="Title" error={errors.title?.message}>
               <TextInput
                 placeholder="What happened in this update?"
@@ -370,10 +363,8 @@ export default function DashboardUpdatesPage() {
           </FormField>
 
           <div
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
               marginTop: "16px",
             }}>
             <label

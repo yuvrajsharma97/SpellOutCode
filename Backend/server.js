@@ -1,8 +1,9 @@
 require("dotenv").config();
-if (process.env.NODE_ENV === "production") {
-  const dns = require("dns");
-  dns.setServers(["8.8.8.8"]);
-}
+
+// mongodb+srv:// requires DNS SRV record lookups, which some local/ISP
+// resolvers (notably on Windows) fail to resolve — force a public resolver.
+const dns = require("dns");
+dns.setServers(["8.8.8.8"]);
 const app = require("./src/app");
 const connectDB = require("./src/config/db");
 

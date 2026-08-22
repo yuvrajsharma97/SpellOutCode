@@ -8,20 +8,15 @@ export default function Navbar() {
 
   return (
     <header
+      className="flex items-center h-[52px] px-4 sm:px-6 md:px-8 sticky top-0 z-[100]"
       style={{
-        height: "52px",
         borderBottom: "1px solid var(--rule)",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 32px",
         background: "var(--paper)",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
       }}>
       {/* Wordmark */}
       <Link
         to="/"
+        className="mr-auto"
         style={{
           fontFamily: "var(--font-mono)",
           fontSize: "13px",
@@ -30,7 +25,6 @@ export default function Navbar() {
           display: "flex",
           alignItems: "center",
           gap: "6px",
-          marginRight: "auto",
           textDecoration: "none",
         }}>
         <span
@@ -45,15 +39,9 @@ export default function Navbar() {
         SpellOutCode
       </Link>
 
-      {/* Nav links — shown on landing only */}
+      {/* Nav links — shown on landing only, hidden on narrow screens */}
       {isLanding && (
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "28px",
-            marginRight: "28px",
-          }}>
+        <nav className="hidden sm:flex items-center gap-7 mr-4 sm:mr-7">
           <NavLinkItem to="/#how-it-works">How it works</NavLinkItem>
         </nav>
       )}
@@ -78,7 +66,7 @@ export default function Navbar() {
           Dashboard
         </Link>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div className="flex items-center gap-2.5 sm:gap-4">
           <Link
             to="/login"
             style={{
@@ -97,10 +85,10 @@ export default function Navbar() {
           </Link>
           <Link
             to="/register"
+            className="px-2.5 py-1.5 sm:px-3.5"
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: "12px",
-              padding: "6px 14px",
               background: "var(--ink)",
               color: "var(--paper)",
               borderRadius: "4px",

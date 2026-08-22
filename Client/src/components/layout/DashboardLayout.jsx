@@ -1,10 +1,13 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderOpen,
   Settings,
   LogOut,
   ExternalLink,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
@@ -22,6 +25,13 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -42,20 +52,36 @@ export default function DashboardLayout() {
       }}>
       {/* Top bar */}
       <header
+        className="flex items-center gap-3 px-4 md:px-6"
         style={{
           height: "52px",
           borderBottom: "1px solid var(--rule)",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 24px",
-          gap: "0",
           background: "var(--paper)",
           position: "sticky",
           top: 0,
           zIndex: 100,
         }}>
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={() => setMobileNavOpen((v) => !v)}
+          aria-label="Toggle navigation"
+          className="md:hidden flex items-center justify-center"
+          style={{
+            width: "32px",
+            height: "32px",
+            border: "1px solid var(--rule)",
+            borderRadius: "4px",
+            background: "transparent",
+            color: "var(--ink-3)",
+            cursor: "pointer",
+            flexShrink: 0,
+          }}>
+          {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
+        </button>
+
         <NavLink
           to="/"
+          className="mr-auto"
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: "13px",
@@ -64,7 +90,6 @@ export default function DashboardLayout() {
             display: "flex",
             alignItems: "center",
             gap: "6px",
-            marginRight: "auto",
           }}>
           <span
             style={{
@@ -83,8 +108,8 @@ export default function DashboardLayout() {
             href={`/${user.username}`}
             target="_blank"
             rel="noopener noreferrer"
+            className="hidden sm:flex"
             style={{
-              display: "flex",
               alignItems: "center",
               gap: "5px",
               fontFamily: "var(--font-mono)",
@@ -102,19 +127,26 @@ export default function DashboardLayout() {
         )}
       </header>
 
-      <div style={{ display: "flex", flex: 1 }}>
-        {/* Sidebar */}
+      <div className="flex flex-1 relative">
+        {/* Mobile backdrop */}
+        {mobileNavOpen && (
+          <div
+            onClick={() => setMobileNavOpen(false)}
+            className="fixed inset-0 md:hidden"
+            style={{ background: "rgba(20, 18, 16, 0.4)", zIndex: 90 }}
+          />
+        )}
+
+        {/* Sidebar — off-canvas drawer on mobile, static column on desktop */}
         <aside
+          className={`fixed md:sticky top-[52px] md:top-[52px] left-0 h-[calc(100vh-52px)] w-[220px] md:w-[200px] flex flex-col transition-transform duration-200 ${
+            mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
           style={{
-            width: "200px",
             borderRight: "1px solid var(--rule)",
             background: "var(--paper-2)",
             padding: "28px 0",
-            display: "flex",
-            flexDirection: "column",
-            position: "sticky",
-            top: "52px",
-            height: "calc(100vh - 52px)",
+            zIndex: 95,
           }}>
           <nav
             style={{
@@ -238,7 +270,9 @@ export default function DashboardLayout() {
         </aside>
 
         {/* Main */}
-        <main style={{ flex: 1, padding: "40px 48px", overflow: "auto" }}>
+        <main
+          className="flex-1 px-4 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10"
+          style={{ overflow: "auto" }}>
           <Outlet />
         </main>
       </div>

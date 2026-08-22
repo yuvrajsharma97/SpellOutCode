@@ -44,10 +44,10 @@ export default function ProjectDetailPage() {
 
   return (
     <div
+      className="px-4 py-8 sm:px-8 sm:py-10 md:py-12"
       style={{
         maxWidth: "860px",
         margin: "0 auto",
-        padding: "48px 32px",
       }}>
       {/* Breadcrumb */}
       <div

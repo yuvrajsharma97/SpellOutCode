@@ -34,7 +34,7 @@ const updateProfile = async (req, res, next) => {
 
     // Prevent empty update requests
     if (Object.keys(parsed.data).length === 0) {
-      return next(new AppError("No update fields provided", 400));
+      return next(new AppError("Please change at least one field before saving.", 400));
     }
 
     const user = await profileService.updateProfile(req.user.id, parsed.data);
@@ -58,7 +58,7 @@ const updateAvatar = async (req, res, next) => {
 
   try {
     if (!req.file) {
-      return next(new AppError("No image file provided", 400));
+      return next(new AppError("Please choose an image to upload.", 400));
     }
 
     const user = await profileService.updateAvatar(

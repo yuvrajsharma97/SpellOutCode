@@ -76,7 +76,7 @@ const getMe = async (userId) => {
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
   return sanitizeUser(user);
@@ -90,13 +90,13 @@ const logoutUser = async (refreshToken) => {
 
 const rotateRefreshToken = async (incomingRefreshToken) => {
   if (!incomingRefreshToken) {
-    throw new AppError("No refresh token provided", 401);
+    throw new AppError("You're not logged in. Please log in to continue.", 401);
   }
 
   try {
     jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_SECRET);
   } catch (error) {
-    throw new AppError("Invalid or expired refresh token", 403);
+    throw new AppError("Your session has expired. Please log in again.", 403);
   }
 
   const user = await User.findOne({
@@ -104,7 +104,7 @@ const rotateRefreshToken = async (incomingRefreshToken) => {
   }).select("+refreshToken");
 
   if (!user) {
-    throw new AppError("Token reuse detected or session revoked", 403);
+    throw new AppError("Your session has expired. Please log in again.", 403);
   }
 
   const accessToken = generateAccessToken(user._id);
@@ -152,7 +152,7 @@ const resetPassword = async (resetToken, newPassword) => {
   }).select("+password");
 
   if (!user) {
-    throw new AppError("Invalid or expired reset token", 400);
+    throw new AppError("This reset link is invalid or has expired.", 400);
   }
 
   user.password = newPassword;

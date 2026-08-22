@@ -1,14 +1,9 @@
 export default function PageHeader({ eyebrow, title, subtitle, actions }) {
   return (
     <div
+      className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 pb-5 sm:mb-10 sm:pb-8"
       style={{
-        marginBottom: "40px",
-        paddingBottom: "32px",
         borderBottom: "1px solid var(--rule)",
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: "16px",
       }}>
       <div>
         {eyebrow && (

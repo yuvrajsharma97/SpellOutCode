@@ -58,7 +58,7 @@ const getUpdatesBySlug = async (req, res, next) => {
     const project = await Project.findOne({ slug: req.params.slug });
 
     if (!project) {
-      return next(new AppError("Project not found", 404));
+      return next(new AppError("This project could not be found.", 404));
     }
 
     const updates = await updateService.getUpdatesByProject(project._id);

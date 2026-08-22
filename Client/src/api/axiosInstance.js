@@ -34,8 +34,9 @@ api.interceptors.response.use(
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
-      "Something went wrong.";
-
+      (error.request
+        ? "Unable to reach the server. Check your connection and try again."
+        : "Something went wrong. Please try again.");
 
     return Promise.reject(new Error(message));
   },

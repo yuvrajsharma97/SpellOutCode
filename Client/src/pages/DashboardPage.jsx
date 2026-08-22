@@ -69,15 +69,13 @@ export default function DashboardPage() {
 
       {/* Stats */}
       <div
+        className="grid grid-cols-1 sm:grid-cols-3 mb-8 md:mb-12"
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
           gap: "1px",
           background: "var(--rule)",
           border: "1px solid var(--rule)",
           borderRadius: "6px",
           overflow: "hidden",
-          marginBottom: "48px",
         }}>
         {[
           { label: "Projects", value: projects.length },
@@ -172,8 +170,8 @@ export default function DashboardPage() {
         ) : (
           <div>
             <div
+              className="hidden md:grid"
               style={{
-                display: "grid",
                 gridTemplateColumns: "1fr 100px 80px 100px 72px",
                 gap: "12px",
                 padding: "8px 0",
@@ -194,13 +192,10 @@ export default function DashboardPage() {
             {projects.slice(0, 6).map((project) => (
               <div
                 key={project._id}
+                className="flex flex-col gap-2 py-3 md:grid md:gap-3 md:items-center"
                 style={{
-                  display: "grid",
                   gridTemplateColumns: "1fr 100px 80px 100px 72px",
-                  gap: "12px",
-                  padding: "12px 0",
                   borderBottom: "1px solid var(--rule)",
-                  alignItems: "center",
                 }}>
                 <div
                   style={{
@@ -213,36 +208,38 @@ export default function DashboardPage() {
                   }}>
                   {project.title}
                 </div>
-                <div>
-                  <StatusBadge status={project.status} />
-                </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    color: "var(--ink-4)",
-                  }}>
-                  {project.updateCount || 0}
-                </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "11px",
-                    color: "var(--ink-4)",
-                  }}>
-                  {formatRelativeDate(project.updatedAt)}
-                </div>
-                <div>
-                  <Link
-                    to={`/dashboard/projects/${project._id}/updates`}
+                <div className="flex flex-wrap items-center gap-3 md:contents">
+                  <div>
+                    <StatusBadge status={project.status} />
+                  </div>
+                  <div
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: "11px",
-                      color: "var(--accent)",
-                      textDecoration: "none",
+                      color: "var(--ink-4)",
                     }}>
-                    Updates →
-                  </Link>
+                    {project.updateCount || 0}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "11px",
+                      color: "var(--ink-4)",
+                    }}>
+                    {formatRelativeDate(project.updatedAt)}
+                  </div>
+                  <div>
+                    <Link
+                      to={`/dashboard/projects/${project._id}/updates`}
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "var(--accent)",
+                        textDecoration: "none",
+                      }}>
+                      Updates →
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
@@ -263,12 +260,7 @@ export default function DashboardPage() {
           }}>
           Quick actions
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "12px",
-          }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <QuickAction
             onClick={() => {
               reset({});
@@ -322,7 +314,7 @@ export default function DashboardPage() {
             />
           </FormField>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Status" error={errors.status?.message}>
               <SelectInput error={errors.status?.message} {...register("status")}>
                 <option value="active">Active</option>
@@ -349,7 +341,7 @@ export default function DashboardPage() {
             />
           </FormField>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="GitHub URL" error={errors.githubUrl?.message}>
               <TextInput
                 placeholder="https://github.com/…"

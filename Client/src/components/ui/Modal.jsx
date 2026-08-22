@@ -7,11 +7,12 @@ export default function Modal({
   title,
   children,
   width = "480px",
+  dismissible = true,
 }) {
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && dismissible) onClose();
     };
     window.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
@@ -19,26 +20,24 @@ export default function Modal({
       window.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, dismissible]);
 
   if (!isOpen) return null;
 
   return (
     <div
+      className="flex items-center justify-center p-3 sm:p-6"
       style={{
         position: "fixed",
         inset: 0,
         background: "rgba(20, 18, 16, 0.4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         zIndex: 1000,
-        padding: "24px",
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (dismissible && e.target === e.currentTarget) onClose();
       }}>
       <div
+        className="max-h-[calc(100vh-24px)] sm:max-h-[calc(100vh-48px)]"
         style={{
           background: "var(--paper)",
           borderRadius: "8px",
@@ -49,15 +48,14 @@ export default function Modal({
           animation: "fadeUp 0.2s ease",
           display: "flex",
           flexDirection: "column",
-          maxHeight: "calc(100vh - 48px)",
         }}>
         {/* Header */}
         <div
+          className="px-4 py-4 sm:px-6 sm:py-5"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "20px 24px",
             borderBottom: "1px solid var(--rule)",
           }}>
           <h2
@@ -91,7 +89,11 @@ export default function Modal({
         </div>
 
         {/* Body */}
-        <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>{children}</div>
+        <div
+          className="px-4 py-4 sm:px-6 sm:py-6"
+          style={{ overflowY: "auto", flex: 1 }}>
+          {children}
+        </div>
       </div>
     </div>
   );

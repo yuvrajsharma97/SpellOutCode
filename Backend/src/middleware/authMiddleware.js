@@ -17,13 +17,15 @@ const protect = async (req, res, next) => {
     );
 
     if (!currentUser) {
-      return next(new AppError("User no longer exists.", 401));
+      return next(
+        new AppError("We couldn't find your account. Please log in again.", 401),
+      );
     }
 
     if (currentUser.changedPasswordAfter(decoded.iat)) {
       return next(
         new AppError(
-          "Password was recently changed. Please log in again.",
+          "Your password was recently changed. Please log in again.",
           401,
         ),
       );
@@ -35,10 +37,12 @@ const protect = async (req, res, next) => {
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return next(
-        new AppError("Session expired. Please refresh your token.", 401),
+        new AppError("Your session has expired. Please log in again.", 401),
       );
     }
-    return next(new AppError("Invalid token. Please log in again.", 401));
+    return next(
+      new AppError("Your session isn't valid. Please log in again.", 401),
+    );
   }
 };
 

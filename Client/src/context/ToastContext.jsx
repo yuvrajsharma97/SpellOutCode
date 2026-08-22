@@ -27,12 +27,12 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={{ addToast }}>
       {children}
       <div
+        className="left-4 right-4 bottom-4 sm:left-auto sm:right-6 sm:bottom-6"
         style={{
           position: "fixed",
-          bottom: "24px",
-          right: "24px",
           display: "flex",
           flexDirection: "column",
+          alignItems: "flex-end",
           gap: "8px",
           zIndex: 9999,
         }}>

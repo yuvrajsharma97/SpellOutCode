@@ -6,17 +6,15 @@ export default function UpdateTimeline({ updates, username, projectSlug }) {
 
   return (
     <div>
-      {updates.map((update, idx) => (
+      {updates.map((update) => (
         <Link
           key={update._id}
           to={`/${username}/projects/${projectSlug}/updates/${update._id}`}
+          className="flex flex-col gap-1.5 sm:grid sm:gap-6"
           style={{
-            display: "grid",
             gridTemplateColumns: "110px 1fr",
-            gap: "24px",
             padding: "20px 0",
-            borderTop:
-              idx === 0 ? "1px solid var(--rule)" : "1px solid var(--rule)",
+            borderTop: "1px solid var(--rule)",
             textDecoration: "none",
             color: "inherit",
             transition: "opacity var(--transition)",

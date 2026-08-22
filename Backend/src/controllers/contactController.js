@@ -19,7 +19,7 @@ const sendEmailToAuthor = async (req, res, next) => {
     );
 
     if (!project || !project.author) {
-      return next(new AppError("Project or author not found", 404));
+      return next(new AppError("This project could not be found.", 404));
     }
 
     await sendContactEmail({

@@ -1,30 +1,79 @@
-// import { Github ,Globe, Linkedin, Twitter } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+
+// lucide-react no longer ships brand/logo icons (Github, Twitter, Linkedin, etc.)
+// so social links are shown as labeled text instead of unlabeled brand marks.
+const SOCIAL_LABELS = {
+  github: "GitHub",
+  linkedin: "LinkedIn",
+  twitter: "Twitter",
+  website: "Website",
+};
 
 const ProfileRail = ({ profile }) => {
-  return (
-    <aside className="profile-rail">
-      <div className="profile-card">
-        <div className="profile-avatar">
-          {profile?.avatar?.url ? (
-            <img
-              src={profile.avatar.url}
-              alt={profile.name}
-              className="avatar-image"
-            />
-          ) : (
-            <div className="avatar-fallback">
-              {profile?.name?.charAt(0)?.toUpperCase()}
-            </div>
-          )}
-        </div>
+  const socialEntries = Object.entries(profile?.socialLinks || {}).filter(
+    ([, url]) => url,
+  );
 
-        <h2>{profile?.name}</h2>
+  return (
+    <aside className="flex md:block items-start gap-5 md:gap-0">
+      <div className="flex-shrink-0">
+        {profile?.avatar?.url ? (
+          <img
+            src={profile.avatar.url}
+            alt={profile.name}
+            className="w-14 h-14 md:w-16 md:h-16 rounded-md object-cover md:mb-5"
+          />
+        ) : (
+          <div
+            className="w-14 h-14 md:w-16 md:h-16 rounded-md flex items-center justify-center md:mb-5"
+            style={{
+              background: "var(--ink)",
+              color: "var(--paper)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "22px",
+              fontWeight: 500,
+            }}>
+            {profile?.name?.charAt(0)?.toUpperCase()}
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1 md:flex-none">
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 500,
+            color: "var(--ink)",
+            marginBottom: "2px",
+            lineHeight: 1.3,
+          }}>
+          {profile?.name}
+        </h2>
 
         {profile?.roleTitle && (
-          <p className="profile-role">{profile.roleTitle}</p>
+          <p
+            style={{
+              fontSize: "13px",
+              color: "var(--ink-4)",
+              fontWeight: 300,
+              marginBottom: "14px",
+            }}>
+            {profile.roleTitle}
+          </p>
         )}
 
-        {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
+        {profile?.bio && (
+          <p
+            style={{
+              fontSize: "13px",
+              color: "var(--ink-3)",
+              fontWeight: 300,
+              lineHeight: 1.6,
+              marginBottom: "16px",
+            }}>
+            {profile.bio}
+          </p>
+        )}
 
         {profile?.skills?.length > 0 && (
           <div style={{ marginTop: "16px", marginBottom: "4px" }}>
@@ -59,43 +108,28 @@ const ProfileRail = ({ profile }) => {
           </div>
         )}
 
-        <div className="profile-links">
-          {profile?.socialLinks?.github && (
-            <a
-              href={profile.socialLinks.github}
-              target="_blank"
-              rel="noreferrer">
-              {/* <Github size={18} /> */}
-            </a>
-          )}
-
-          {profile?.socialLinks?.linkedin && (
-            <a
-              href={profile.socialLinks.linkedin}
-              target="_blank"
-              rel="noreferrer">
-              {/* <Linkedin size={18} /> */}
-            </a>
-          )}
-
-          {profile?.socialLinks?.twitter && (
-            <a
-              href={profile.socialLinks.twitter}
-              target="_blank"
-              rel="noreferrer">
-              {/* <Twitter size={18} /> */}
-            </a>
-          )}
-
-          {profile?.socialLinks?.website && (
-            <a
-              href={profile.socialLinks.website}
-              target="_blank"
-              rel="noreferrer">
-              {/* <Globe size={18} /> */}
-            </a>
-          )}
-        </div>
+        {socialEntries.length > 0 && (
+          <div className="flex flex-col gap-2 mt-4">
+            {socialEntries.map(([key, url]) => (
+              <a
+                key={key}
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 transition-colors w-fit"
+                style={{
+                  color: "var(--ink-4)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11px",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-4)")}>
+                {SOCIAL_LABELS[key] || key}
+                <ExternalLink size={11} />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </aside>
   );

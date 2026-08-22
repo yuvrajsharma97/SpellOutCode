@@ -10,8 +10,8 @@ export default function AuthLayout() {
         flexDirection: "column",
       }}>
       <header
+        className="px-4 py-4 sm:px-8 sm:py-5"
         style={{
-          padding: "20px 32px",
           borderBottom: "1px solid var(--rule)",
         }}>
         <Link
@@ -40,12 +40,12 @@ export default function AuthLayout() {
       </header>
 
       <main
+        className="px-4 py-8 sm:px-6 sm:py-12"
         style={{
           flex: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "48px 24px",
         }}>
         <Outlet />
       </main>

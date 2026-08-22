@@ -41,7 +41,8 @@ export default function ContactModal({
       isOpen={isOpen}
       onClose={onClose}
       title={`Contact ${recipientName}`}
-      width="460px">
+      width="460px"
+      dismissible={false}>
       <p
         style={{
           fontSize: "13px",

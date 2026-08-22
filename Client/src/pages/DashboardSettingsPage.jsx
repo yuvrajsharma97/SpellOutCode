@@ -23,9 +23,8 @@ export default function DashboardSettingsPage() {
 
       {/* Tabs */}
       <div
+        className="flex overflow-x-auto"
         style={{
-          display: "flex",
-          gap: "0",
           borderBottom: "1px solid var(--rule)",
           marginBottom: "36px",
         }}>
@@ -33,6 +32,7 @@ export default function DashboardSettingsPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
+            className="whitespace-nowrap"
             style={{
               padding: "9px 18px",
               border: "none",
@@ -469,11 +469,11 @@ function SecurityTab() {
           }}
           onClick={() => { if (!deleting) setDeleteOpen(false); }}>
           <div
+            className="p-6 sm:p-8"
             style={{
               background: "var(--paper)",
               border: "1px solid var(--rule)",
               borderRadius: "4px",
-              padding: "32px",
               width: "100%",
               maxWidth: "400px",
               margin: "0 16px",

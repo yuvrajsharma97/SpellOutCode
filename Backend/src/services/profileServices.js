@@ -13,7 +13,7 @@ const getProfileByUsername = async (username) => {
   );
 
   if (!user) {
-    throw new AppError("Profile not found", 404);
+    throw new AppError("This profile could not be found.", 404);
   }
 
   return user;
@@ -30,7 +30,7 @@ const updateProfile = async (userId, data) => {
   );
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
   return user;
@@ -43,7 +43,7 @@ const updateAvatar = async (userId, fileBuffer, originalName) => {
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
   // Attempt to delete old avatar — failure is non-blocking (stale/missing fileId)
@@ -77,7 +77,7 @@ const removeAvatar = async (userId) => {
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
   if (user.avatar?.fileId) {
@@ -96,7 +96,7 @@ const removeAvatar = async (userId) => {
 
 const deleteAccount = async (userId) => {
   const user = await User.findById(userId);
-  if (!user) throw new AppError("User not found", 404);
+  if (!user) throw new AppError("We couldn't find your account. Please log in again.", 404);
 
   // Delete avatar from ImageKit
   if (user.avatar?.fileId) {

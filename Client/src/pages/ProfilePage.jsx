@@ -55,13 +55,10 @@ export default function ProfilePage() {
 
   return (
     <div
+      className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 md:gap-16 px-4 py-8 sm:px-8 sm:py-10 md:py-12"
       style={{
-        display: "grid",
-        gridTemplateColumns: "220px 1fr",
         maxWidth: "960px",
         margin: "0 auto",
-        padding: "48px 32px",
-        gap: "64px",
         minHeight: "calc(100vh - 52px)",
       }}>
       {/* Rail */}
@@ -125,12 +122,13 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search projects…"
-            style={{ width: "190px" }}
-          />
+          <div className="w-full sm:w-[190px]">
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search projects…"
+            />
+          </div>
         </div>
 
         {/* Project list */}
@@ -171,7 +169,7 @@ export default function ProfilePage() {
 
 function ProfileRailSkeleton() {
   return (
-    <aside style={{ paddingRight: "40px" }}>
+    <aside className="md:pr-10">
       <div
         className="skeleton"
         style={{

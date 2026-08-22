@@ -82,7 +82,7 @@ app.use("/api/contact", contactRoutes);
 
 // 404 Not Found handler
 app.use((req, res, next) => {
-  next(new AppError(`Route ${req.originalUrl} not found`, 404));
+  next(new AppError("We couldn't find what you were looking for.", 404));
 });
 
 // Global error handling middleware

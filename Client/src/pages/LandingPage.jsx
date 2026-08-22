@@ -54,8 +54,8 @@ export default function LandingPage() {
     <div style={{ background: 'var(--paper)' }}>
       {/* ── Hero ── */}
       <section
+        className="px-5 pt-14 pb-12 sm:px-8 sm:pt-20 sm:pb-16 md:pt-24 md:pb-20"
         style={{
-          padding: '96px 32px 80px',
           maxWidth: '860px',
           margin: '0 auto',
           width: '100%',
@@ -137,25 +137,19 @@ export default function LandingPage() {
       </section>
 
       {/* ── Feature trio ── */}
-      <hr style={{ border: 'none', borderTop: '1px solid var(--rule)', margin: '0 32px' }} />
+      <hr className="mx-5 sm:mx-8" style={{ border: 'none', borderTop: '1px solid var(--rule)' }} />
 
       <section
+        className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[var(--rule)] px-5 sm:px-8"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
           maxWidth: '860px',
           margin: '0 auto',
-          padding: '0 32px',
         }}
       >
-        {FEATURES.map((f, i) => (
+        {FEATURES.map((f) => (
           <div
             key={f.num}
-            style={{
-              padding: '40px 32px 40px 0',
-              borderRight: i < 2 ? '1px solid var(--rule)' : 'none',
-              paddingLeft: i > 0 ? '32px' : '0',
-            }}
+            className="py-8 md:py-10 md:px-8 first:md:pl-0 last:md:pr-0"
           >
             <div
               style={{
@@ -188,11 +182,11 @@ export default function LandingPage() {
 
       {/* ── Example timeline ── */}
       <section
+        className="px-5 py-9 sm:px-8 sm:py-12"
         style={{
           background: 'var(--paper-2)',
           borderTop: '1px solid var(--rule)',
           borderBottom: '1px solid var(--rule)',
-          padding: '48px 32px',
         }}
       >
         <div
@@ -217,10 +211,9 @@ export default function LandingPage() {
           {EXAMPLE_UPDATES.map((u, i) => (
             <div
               key={i}
+              className="flex flex-col gap-1.5 sm:grid sm:gap-6"
               style={{
-                display: 'grid',
                 gridTemplateColumns: '130px 1fr',
-                gap: '24px',
                 padding: '18px 0',
                 borderTop: '1px solid var(--rule)',
                 alignItems: 'start',
@@ -276,7 +269,8 @@ export default function LandingPage() {
       {/* ── How it works ── */}
       <section
         id="how-it-works"
-        style={{ padding: '72px 32px', maxWidth: '860px', margin: '0 auto' }}
+        className="px-5 py-14 sm:px-8 sm:py-16 md:py-[72px]"
+        style={{ maxWidth: '860px', margin: '0 auto' }}
       >
         <div
           style={{
@@ -324,9 +318,9 @@ export default function LandingPage() {
 
       {/* ── CTA strip ── */}
       <section
+        className="px-5 py-14 sm:px-8 sm:py-16 md:py-[72px]"
         style={{
           borderTop: '1px solid var(--rule)',
-          padding: '72px 32px',
           textAlign: 'center',
           background: 'var(--paper-2)',
         }}
@@ -376,12 +370,9 @@ export default function LandingPage() {
 
       {/* ── Footer ── */}
       <footer
+        className="px-5 py-6 sm:px-8 sm:py-7 flex flex-col sm:flex-row items-center gap-4 sm:justify-between"
         style={{
           borderTop: '1px solid var(--rule)',
-          padding: '28px 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
         }}
       >
         <span

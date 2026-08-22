@@ -65,7 +65,7 @@ export default function AvatarUploader() {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+    <div className="flex flex-wrap items-center gap-5">
       {/* Current avatar */}
       <div style={{ position: "relative" }}>
         {preview ? (
