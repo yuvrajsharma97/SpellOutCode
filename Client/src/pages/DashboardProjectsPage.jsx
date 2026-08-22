@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Pencil, Trash2, ExternalLink, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, FileText } from "lucide-react";
 import {
   useMyProjects,
   useCreateProject,
@@ -240,10 +240,8 @@ export default function DashboardProjectsPage() {
                   }}>
                   <FileText size={14} />
                 </Link>
-                <a
-                  href={`/${user?.username}/projects/${project.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to={`/${user?.username}/projects/${project.slug}`}
                   title="View public page"
                   style={{
                     display: "flex",
@@ -262,8 +260,8 @@ export default function DashboardProjectsPage() {
                     e.currentTarget.style.color = "var(--ink-4)";
                     e.currentTarget.style.background = "transparent";
                   }}>
-                  <ExternalLink size={14} />
-                </a>
+                  <Eye size={14} />
+                </Link>
                 <button
                   onClick={() => openEdit(project)}
                   title="Edit project"

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderOpen,
   Settings,
   LogOut,
-  ExternalLink,
+  User,
   Menu,
   X,
 } from "lucide-react";
@@ -176,10 +176,8 @@ function SidebarContent({ user, onLogout }) {
             <SidebarItem key={item.to} {...item} />
           ))}
           {user && (
-            <a
-              href={`/${user.username}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to={`/${user.username}`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -199,9 +197,9 @@ function SidebarContent({ user, onLogout }) {
                 e.currentTarget.style.background = "transparent";
                 e.currentTarget.style.color = "var(--ink-3)";
               }}>
-              <ExternalLink size={14} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
+              <User size={14} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
               View public profile
-            </a>
+            </Link>
           )}
         </SidebarSection>
       </nav>
