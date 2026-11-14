@@ -29,7 +29,7 @@ const updateProfile = async (req, res, next) => {
   try {
     const parsed = updateProfileSchema.safeParse(req.body);
     if (!parsed.success) {
-      return next(new AppError(parsed.error.errors[0].message, 400));
+      return next(new AppError(parsed.error.issues[0].message, 400));
     }
 
     // Prevent empty update requests

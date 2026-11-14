@@ -3,9 +3,9 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 const errorHandler = require("./middleware/errorHandlerMiddleware");
+const originCheck = require("./middleware/originCheckMiddleware");
 const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const updateRoutes = require("./routes/updateRoutes");
@@ -15,7 +15,19 @@ const AppError = require("./utils/appError");
 
 const app = express();
 
-app.set("trust proxy", 1);
+// How many proxies sit in front of the app. req.ip (used by every rate
+// limiter) is read from X-Forwarded-For only for this many hops; trusting
+// more hops than really exist lets clients fake their IP.
+//   Render: 1 (its load balancer). Render sets RENDER=true automatically.
+//   Local / no proxy: 0. Override with TRUST_PROXY_HOPS if the setup changes
+//   (e.g. Cloudflare in front of Render -> 2).
+const trustProxyHops =
+  process.env.TRUST_PROXY_HOPS !== undefined
+    ? Number(process.env.TRUST_PROXY_HOPS)
+    : process.env.RENDER
+      ? 1
+      : 0;
+app.set("trust proxy", trustProxyHops);
 
 app.use(helmet());
 
@@ -52,13 +64,23 @@ app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/forgot-password", authLimiter);
 app.use("/api/auth/reset-password", authLimiter);
+app.use("/api/auth/verify-email", authLimiter);
+app.use("/api/auth/resend-verification", authLimiter);
 
-app.use(express.json({ limit: "10kb" }));
+// CSRF: state-changing requests must come from the configured client origin.
+app.use("/api", originCheck);
 
-app.use(express.urlencoded({ extended: true }));
+// Update content may be up to 50,000 characters (validators/updateValidator),
+// so the body limit must allow that plus JSON escaping.
+app.use(express.json({ limit: "150kb" }));
 
-// express-mongo-sanitize v2.2.0 is incompatible with Express 5 (req.query is read-only)
-// app.use(mongoSanitize({ replaceWith: "_" }));
+// No urlencoded parser: this is a JSON API, and accepting form posts is
+// what lets a plain cross-site <form> submit authenticated requests.
+
+// express-mongo-sanitize v2.2.0 is incompatible with Express 5 (req.query is
+// read-only). Query inputs are zod-parsed, and auth cookies are type-checked
+// as strings before any lookup, because cookie-parser decodes "j:{...}"
+// cookies into objects.
 
 app.use(cookieParser());
 

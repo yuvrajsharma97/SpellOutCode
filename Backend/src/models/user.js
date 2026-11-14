@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    // Last time a password-reset email was sent; used for a per-account cooldown.
+    passwordResetRequestedAt: {
+      type: Date,
+      select: false,
+    },
     avatar: {
       url: { type: String, default: "" },
       fileId: { type: String, default: "" },
@@ -120,7 +125,6 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // valid for 10 minutes
   return resetToken;
 };
-
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

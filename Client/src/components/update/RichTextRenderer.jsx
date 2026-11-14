@@ -1,9 +1,9 @@
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 
 export default function RichTextRenderer({ content }) {
   if (!content) return null;
 
-  const clean = DOMPurify.sanitize(content);
+  const clean = sanitizeHtml(content);
 
   return (
     <div

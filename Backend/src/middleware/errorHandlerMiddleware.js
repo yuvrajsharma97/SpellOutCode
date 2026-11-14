@@ -1,8 +1,24 @@
 const AppError = require("../utils/appError");
 
+// The email message stays generic so a duplicate-key race cannot be used
+// to check whether an address has an account.
 const FRIENDLY_DUPLICATE_FIELDS = {
-  email: "This email is already registered.",
+  email: "This email can't be used. Please try another or sign in.",
   username: "This username is already taken.",
+};
+
+const MULTER_MESSAGES = {
+  LIMIT_FILE_SIZE: ["Images must be 5MB or smaller.", 413],
+  LIMIT_FILE_COUNT: ["Upload one image at a time.", 400],
+  LIMIT_UNEXPECTED_FILE: ["Unexpected file field.", 400],
+};
+
+const handleMulterError = (err) => {
+  const [message, status] = MULTER_MESSAGES[err.code] || [
+    "The upload was too large or malformed.",
+    400,
+  ];
+  return new AppError(message, status);
 };
 
 const handleCastError = () =>
@@ -30,6 +46,12 @@ const handleJWTInvalid = () =>
 const errorHandler = (err, req, res, next) => {
   let error = err;
 
+  if (err.name === "MulterError") error = handleMulterError(err);
+  // body-parser errors carry a type; without this they surface as 500s.
+  if (err.type === "entity.too.large")
+    error = new AppError("That request is too large.", 413);
+  if (err.type === "entity.parse.failed")
+    error = new AppError("The request body isn't valid JSON.", 400);
   if (err.name === "CastError") error = handleCastError(err);
   if (err.code === 11000) error = handleDuplicateFields(err);
   if (err.name === "ValidationError") error = handleValidationError(err);

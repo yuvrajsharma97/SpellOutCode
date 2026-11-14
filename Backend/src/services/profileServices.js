@@ -4,6 +4,21 @@ const Update = require("../models/update");
 const AppError = require("../utils/appError");
 const imageService = require("./uploadToImageKitService");
 
+// Best-effort ImageKit delete. A failure is logged with the fileId so it
+// can be cleaned up by hand, never silently dropped.
+const safeDeleteImage = async (fileId) => {
+  if (!fileId) return;
+  try {
+    await imageService.deleteImage(fileId);
+  } catch (err) {
+    console.error(`[imagekit] failed to delete file ${fileId}:`, err.message);
+  }
+};
+
+// Matches a stored avatar fileId, treating "" and a missing field alike.
+const avatarFileIdFilter = (fileId) =>
+  fileId ? fileId : { $in: ["", null] };
+
 /**
  * get profile by username (public route) 
  */
@@ -39,23 +54,21 @@ const updateProfile = async (userId, data) => {
 /**
  * update avatar (protected route)
  */
+/**
+ * Replace the avatar so that exactly one ImageKit file stays referenced:
+ * upload the new file, commit it only if the avatar was not changed by a
+ * concurrent request (compare-and-set on the old fileId), then delete the
+ * old file. A request that loses the race deletes its own upload.
+ */
 const updateAvatar = async (userId, fileBuffer, originalName) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("username avatar");
 
   if (!user) {
     throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
-  // Attempt to delete old avatar — failure is non-blocking (stale/missing fileId)
-  if (user.avatar?.fileId) {
-    try {
-      await imageService.deleteImage(user.avatar.fileId);
-    } catch {
-      // continue with upload regardless
-    }
-  }
-
-  const ext = originalName.split(".").pop();
+  const oldFileId = user.avatar?.fileId || "";
+  const ext = originalName.split(".").pop().toLowerCase();
   const fileName = `avatar-${user.username}.${ext}`;
 
   const { url, fileId } = await imageService.uploadImage(
@@ -64,10 +77,29 @@ const updateAvatar = async (userId, fileBuffer, originalName) => {
     "/SpellOutCode/avatars",
   );
 
-  user.avatar = { url, fileId };
-  await user.save();
+  let updated;
+  try {
+    updated = await User.findOneAndUpdate(
+      { _id: userId, "avatar.fileId": avatarFileIdFilter(oldFileId) },
+      { $set: { avatar: { url, fileId } } },
+      { new: true },
+    );
+  } catch (err) {
+    await safeDeleteImage(fileId);
+    throw err;
+  }
 
-  return user;
+  if (!updated) {
+    await safeDeleteImage(fileId);
+    throw new AppError(
+      "Your avatar was changed by another request. Please try again.",
+      409,
+    );
+  }
+
+  await safeDeleteImage(oldFileId);
+
+  return updated;
 };
 
 /**
@@ -80,48 +112,44 @@ const removeAvatar = async (userId) => {
     throw new AppError("We couldn't find your account. Please log in again.", 404);
   }
 
-  if (user.avatar?.fileId) {
-    try {
-      await imageService.deleteImage(user.avatar.fileId);
-    } catch {
-      // continue regardless
-    }
+  const oldFileId = user.avatar?.fileId || "";
+
+  const updated = await User.findOneAndUpdate(
+    { _id: userId, "avatar.fileId": avatarFileIdFilter(oldFileId) },
+    { $set: { avatar: { url: "", fileId: "" } } },
+    { new: true },
+  );
+
+  if (!updated) {
+    throw new AppError(
+      "Your avatar was changed by another request. Please try again.",
+      409,
+    );
   }
 
-  user.avatar = { url: "", fileId: "" };
-  await user.save();
+  await safeDeleteImage(oldFileId);
 
-  return user;
+  return updated;
 };
 
 const deleteAccount = async (userId) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError("We couldn't find your account. Please log in again.", 404);
 
-  // Delete avatar from ImageKit
-  if (user.avatar?.fileId) {
-    try { await imageService.deleteImage(user.avatar.fileId); } catch {}
-  }
+  const projects = await Project.find({ author: userId }).select("_id coverImage");
+  const projectIds = projects.map((p) => p._id);
+  // Updates written by this user, plus anything left inside their projects.
+  const updateFilter = { $or: [{ author: userId }, { project: { $in: projectIds } }] };
+  const updates = await Update.find(updateFilter).select("coverImage");
 
-  // Delete all update cover images
-  const updates = await Update.find({ author: userId }).select("coverImage");
-  for (const update of updates) {
-    if (update.coverImage?.fileId) {
-      try { await imageService.deleteImage(update.coverImage.fileId); } catch {}
-    }
-  }
-
-  // Delete all project cover images
-  const projects = await Project.find({ author: userId }).select("coverImage");
-  for (const project of projects) {
-    if (project.coverImage?.fileId) {
-      try { await imageService.deleteImage(project.coverImage.fileId); } catch {}
-    }
-  }
-
-  await Update.deleteMany({ author: userId });
+  // Remove the account data first, then clean up stored images.
+  await Update.deleteMany(updateFilter);
   await Project.deleteMany({ author: userId });
   await User.findByIdAndDelete(userId);
+
+  await safeDeleteImage(user.avatar?.fileId);
+  for (const update of updates) await safeDeleteImage(update.coverImage?.fileId);
+  for (const project of projects) await safeDeleteImage(project.coverImage?.fileId);
 };
 
 module.exports = {

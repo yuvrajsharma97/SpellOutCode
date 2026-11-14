@@ -3,6 +3,10 @@ const slugify = require("slugify");
 const Project = require("../models/project");
 const User = require("../models/user");
 const AppError = require("../utils/appError");
+const { paginationMeta } = require("../utils/pagination");
+
+// Upper bound on how many projects one account can own.
+const MAX_PROJECTS_PER_USER = 100;
 
 // Generate a unique slug.
 const generateUniqueSlug = async (title) => {
@@ -28,6 +32,14 @@ const generateUniqueSlug = async (title) => {
  * Create a new project with a unique slug and associate it with the author.
  */
 const createProject = async (authorId, data) => {
+  const owned = await Project.countDocuments({ author: authorId });
+  if (owned >= MAX_PROJECTS_PER_USER) {
+    throw new AppError(
+      `An account can have at most ${MAX_PROJECTS_PER_USER} projects.`,
+      400,
+    );
+  }
+
   const slug = await generateUniqueSlug(data.title);
 
   const project = await Project.create({
@@ -52,11 +64,12 @@ const getProjectsByUser = async (userId) => {
 
   const projects = await Project.find({ author: user._id })
     .populate("author", "name username avatar roleTitle")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .limit(MAX_PROJECTS_PER_USER);
 
   const projectIds = projects.map((p) => p._id);
   const counts = await Update.aggregate([
-    { $match: { project: { $in: projectIds } } },
+    { $match: { project: { $in: projectIds }, author: user._id } },
     { $group: { _id: "$project", count: { $sum: 1 } } },
   ]);
   const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
@@ -70,32 +83,47 @@ const getProjectsByUser = async (userId) => {
 /**
  * Get all projects for a given username.
  */
-const getProjectsByUsername = async (username) => {
+const getProjectsByUsername = async (username, pagination) => {
   const user = await User.findOne({ username });
   if (!user) throw new AppError("We couldn't find that user.", 404);
 
-  const projects = await Project.find({ author: user._id })
-    .populate("author", "name username avatar roleTitle")
-    .sort({ createdAt: -1 });
+  const filter = { author: user._id };
+  const [projects, total] = await Promise.all([
+    Project.find(filter)
+      .populate("author", "name username avatar roleTitle")
+      .sort({ createdAt: -1 })
+      .skip(pagination.skip)
+      .limit(pagination.limit),
+    Project.countDocuments(filter),
+  ]);
 
   const projectIds = projects.map((p) => p._id);
   const counts = await Update.aggregate([
-    { $match: { project: { $in: projectIds }, published: true } },
+    { $match: { project: { $in: projectIds }, author: user._id, published: true } },
     { $group: { _id: "$project", count: { $sum: 1 } } },
   ]);
   const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
 
-  return projects.map((p) => ({
-    ...p.toObject(),
-    updateCount: countMap.get(p._id.toString()) || 0,
-  }));
+  return {
+    projects: projects.map((p) => ({
+      ...p.toObject(),
+      updateCount: countMap.get(p._id.toString()) || 0,
+    })),
+    pagination: paginationMeta(pagination, total),
+  };
 };
 
 /**
- * Get single project by slug
+ * Get a single project for the public URL /:username/projects/:slug. The
+ * slug must belong to that username.
  */
-const getProjectBySlug = async (slug) => {
-  const project = await Project.findOne({ slug }).populate(
+const getProjectBySlug = async (username, slug) => {
+  const user = await User.findOne({ username }).select("_id");
+  if (!user) {
+    throw new AppError("This project could not be found.", 404);
+  }
+
+  const project = await Project.findOne({ slug, author: user._id }).populate(
     "author",
     "name username avatar roleTitle",
   );

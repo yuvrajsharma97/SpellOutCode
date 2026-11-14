@@ -6,7 +6,8 @@ const protect = async (req, res, next) => {
   try {
     const token = req.cookies?.accessToken;
 
-    if (!token) {
+    // cookie-parser decodes "j:{...}" cookies into objects; only accept strings.
+    if (typeof token !== "string" || !token) {
       return next(new AppError("Not authenticated. Please log in.", 401));
     }
 

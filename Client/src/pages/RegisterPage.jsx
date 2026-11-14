@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { authApi } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { registerSchema } from "../schemas";
@@ -10,7 +12,8 @@ import Button from "../components/ui/Button";
 export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const { addToast } = useToast();
-  const navigate = useNavigate();
+  const [sentTo, setSentTo] = useState(null);
+  const [resending, setResending] = useState(false);
 
   const {
     register,
@@ -24,7 +27,7 @@ export default function RegisterPage() {
   const onSubmit = async (data) => {
     try {
       await registerUser(data);
-      navigate("/dashboard");
+      setSentTo(data.email);
     } catch (err) {
       addToast({
         message: err.message || "Registration failed. Try again.",
@@ -32,6 +35,60 @@ export default function RegisterPage() {
       });
     }
   };
+
+  const resend = async () => {
+    setResending(true);
+    try {
+      const res = await authApi.resendVerification({ email: sentTo });
+      addToast({ message: res?.message || "If a sign-up is waiting, we've sent a new link." });
+    } catch (err) {
+      addToast({ message: err.message || "Couldn't resend. Try again shortly.", type: "error" });
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (sentTo) {
+    return (
+      <div style={{ width: "100%", maxWidth: "400px", textAlign: "center" }}>
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
+            color: "var(--success)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            marginBottom: "20px",
+          }}>
+          Check your inbox
+        </div>
+        <h1
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "24px",
+            fontWeight: 400,
+            color: "var(--ink)",
+            marginBottom: "12px",
+          }}>
+          Confirm your email to finish.
+        </h1>
+        <p style={{ fontSize: "14px", color: "var(--ink-4)", fontWeight: 300, marginBottom: "28px", lineHeight: 1.6 }}>
+          If <strong>{sentTo}</strong> can be used, we've sent it a verification link.
+          It expires in 24 hours. If you already have an account, sign in instead.
+        </p>
+        <Button fullWidth isLoading={resending} onClick={resend}>
+          Resend link
+        </Button>
+        <p style={{ marginTop: "20px" }}>
+          <Link
+            to="/login"
+            style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", textDecoration: "none" }}>
+            Go to sign in →
+          </Link>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", maxWidth: "400px" }}>

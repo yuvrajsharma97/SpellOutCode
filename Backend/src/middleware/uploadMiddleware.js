@@ -20,7 +20,17 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: MAX_FILE_SIZE }, // 5MB max
+  // Bound every part of the multipart body, not just the file: text fields
+  // are buffered in memory too.
+  limits: {
+    fileSize: MAX_FILE_SIZE, // 5MB max
+    files: 1,
+    fields: 5,
+    fieldSize: 1024,
+    fieldNameSize: 100,
+    parts: 6,
+    headerPairs: 50,
+  },
 });
 
 module.exports = upload;

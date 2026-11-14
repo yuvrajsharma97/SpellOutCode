@@ -4,6 +4,7 @@ const {
   updateProjectSchema,
 } = require("../validators/projectValidator");
 const AppError = require("../utils/appError");
+const { parsePagination } = require("../utils/pagination");
 
 /**
  * POST /api/projects/create-new-project
@@ -52,13 +53,14 @@ const getMyProjects = async (req, res, next) => {
  */
 const getProjectsByUsername = async (req, res, next) => {
   try {
-    const projects = await projectService.getProjectsByUsername(
+    const { projects, pagination } = await projectService.getProjectsByUsername(
       req.params.username,
+      parsePagination(req.query),
     );
 
     res.status(200).json({
       success: true,
-      data: { projects },
+      data: { projects, pagination },
     });
   } catch (error) {
     next(error);
@@ -70,7 +72,10 @@ const getProjectsByUsername = async (req, res, next) => {
  */
 const getProjectBySlug = async (req, res, next) => {
   try {
-    const project = await projectService.getProjectBySlug(req.params.slug);
+    const project = await projectService.getProjectBySlug(
+      req.params.username,
+      req.params.slug,
+    );
 
     res.status(200).json({
       success: true,

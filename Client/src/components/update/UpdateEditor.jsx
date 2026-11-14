@@ -4,6 +4,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect } from "react";
 import  EditorToolbar  from "../../components/ui/EditorToolbar";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 
 export default function UpdateEditor({
   value,
@@ -16,7 +17,8 @@ export default function UpdateEditor({
       Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder }),
     ],
-    content: value || "",
+    // Stored HTML is sanitized before the editor parses it.
+    content: sanitizeHtml(value),
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },

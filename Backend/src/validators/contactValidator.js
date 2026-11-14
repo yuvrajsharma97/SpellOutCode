@@ -18,11 +18,6 @@ const contactSchema = z.object({
   projectId: z.string().trim().optional(),
 });
 
-const forgotPasswordSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
-});
-
 module.exports = {
   contactSchema,
-  forgotPasswordSchema,
 };

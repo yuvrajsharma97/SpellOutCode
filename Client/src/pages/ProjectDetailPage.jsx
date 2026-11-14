@@ -19,6 +19,8 @@ export default function ProjectDetailPage() {
     isLoading: projectLoading,
     isError,
   } = usePublicProject(username, slug);
+  // Show the author the API returned, not whatever the URL says.
+  const authorName = projectData?.author?.username || username;
   const { data: updatesData, isLoading: updatesLoading } = usePublicUpdates(
     username,
     slug,
@@ -62,7 +64,7 @@ export default function ProjectDetailPage() {
           gap: "8px",
         }}>
         <Link
-          to={`/${username}`}
+          to={`/${authorName}`}
           style={{
             color: "var(--ink-4)",
             textDecoration: "none",
@@ -70,7 +72,7 @@ export default function ProjectDetailPage() {
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-4)")}>
-          {username}
+          {authorName}
         </Link>
         <span style={{ color: "var(--rule)" }}>/</span>
         <span style={{ color: "var(--ink-3)" }}>{slug}</span>
@@ -260,7 +262,7 @@ export default function ProjectDetailPage() {
       ) : (
         <UpdateTimeline
           updates={updates}
-          username={username}
+          username={authorName}
           projectSlug={slug}
         />
       )}

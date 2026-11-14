@@ -22,6 +22,8 @@ export default function UpdateDetailPage() {
   );
 
   const update = data;
+  // Show the author the API returned, not whatever the URL says.
+  const authorName = update?.author?.username || username;
 
   if (isError) {
     return (
@@ -61,11 +63,11 @@ export default function UpdateDetailPage() {
             gap: "8px",
             flexWrap: "wrap",
           }}>
-          <Link to={`/${username}`} style={crumbStyle}>
-            {username}
+          <Link to={`/${authorName}`} style={crumbStyle}>
+            {authorName}
           </Link>
           <span style={{ color: "var(--rule)" }}>/</span>
-          <Link to={`/${username}/projects/${slug}`} style={crumbStyle}>
+          <Link to={`/${authorName}/projects/${slug}`} style={crumbStyle}>
             {slug}
           </Link>
           <span style={{ color: "var(--rule)" }}>/</span>
@@ -139,7 +141,7 @@ export default function UpdateDetailPage() {
             <MetaItem label="Date" value={formatDate(update.createdAt)} />
             <MetaItem label="Project">
               <Link
-                to={`/${username}/projects/${slug}`}
+                to={`/${authorName}/projects/${slug}`}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "12px",
@@ -154,7 +156,7 @@ export default function UpdateDetailPage() {
             </MetaItem>
             <MetaItem label="Author">
               <Link
-                to={`/${username}`}
+                to={`/${authorName}`}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "12px",
@@ -168,7 +170,7 @@ export default function UpdateDetailPage() {
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.color = "var(--ink-3)")
                 }>
-                @{username}
+                @{authorName}
               </Link>
             </MetaItem>
             {update.tags?.[0] && (
@@ -194,7 +196,7 @@ export default function UpdateDetailPage() {
                 borderTop: "1px solid var(--rule)",
               }}>
               <Link
-                to={`/${username}/projects/${slug}`}
+                to={`/${authorName}/projects/${slug}`}
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "11px",

@@ -56,3 +56,6 @@ coverage/
 # Misc
 # =========================
 *.local
+# Agent skills (local only)
+.agents/
+skills-lock.json

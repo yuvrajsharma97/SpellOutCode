@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../api/auth";
 
 const AuthContext = createContext(null);
@@ -6,6 +7,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const fetchMe = async () => {
     try {
@@ -27,19 +29,27 @@ export const AuthProvider = ({ children }) => {
     fetchMe();
   }, []);
 
-  const register = async (payload) => {
-    const response = await authApi.register(payload);
+  // Cached queries (my projects, drafts) belong to whoever was signed in.
+  // Drop them whenever the signed-in user changes so the next account on
+  // this tab never sees them.
+  const startSession = (nextUser) => {
+    queryClient.clear();
+    setUser(nextUser || null);
+  };
 
-    setUser(response?.data?.user || null);
+  // Sign-up only creates a pending account; the session starts after the
+  // emailed link is confirmed (see verifyEmail).
+  const register = async (payload) => authApi.register(payload);
 
+  const verifyEmail = async (token, payload) => {
+    const response = await authApi.verifyEmail(token, payload);
+    startSession(response?.data?.user);
     return response;
   };
 
   const login = async (payload) => {
     const response = await authApi.login(payload);
-
-    setUser(response?.data?.user || null);
-
+    startSession(response?.data?.user);
     return response;
   };
 
@@ -47,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authApi.logout();
     } finally {
-      setUser(null);
+      startSession(null);
     }
   };
 
@@ -57,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       setUser,
       register,
+      verifyEmail,
       login,
       logout,
       fetchMe,

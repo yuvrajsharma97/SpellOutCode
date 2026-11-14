@@ -4,6 +4,7 @@ const {
   createUpdateSchema,
   updateUpdateSchema,
 } = require("../validators/updateValidator");
+const { parsePagination } = require("../utils/pagination");
 const AppError = require("../utils/appError");
 
 /**
@@ -33,58 +34,24 @@ const createUpdate = async (req, res, next) => {
 };
 
 /**
- * GET /api/projects/:projectId/updates  (public — published only)
+ * GET /api/projects/:projectId/updates  (public, published only)
  */
 const getUpdatesByProject = async (req, res, next) => {
   try {
-    const updates = await updateService.getUpdatesByProject(
-      req.params.projectId,
-    );
-
-    res.status(200).json({
-      success: true,
-      data: { updates },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * GET public updates by project slug
- */
-const getUpdatesBySlug = async (req, res, next) => {
-  try {
-    const project = await Project.findOne({ slug: req.params.slug });
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) {
       return next(new AppError("This project could not be found.", 404));
     }
 
-    const updates = await updateService.getUpdatesByProject(project._id);
-
-    res.status(200).json({
-      success: true,
-      data: { updates },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * GET /api/projects/:projectId/my-updates  (protected — all updates, owner only)
- */
-const getMyUpdatesByProject = async (req, res, next) => {
-  try {
-    const updates = await updateService.getUpdatesByProject(
-      req.params.projectId,
-      false,
+    const { updates, pagination } = await updateService.getUpdatesByProject(
+      project,
+      { pagination: parsePagination(req.query) },
     );
 
     res.status(200).json({
       success: true,
-      data: { updates },
+      data: { updates, pagination },
     });
   } catch (error) {
     next(error);
@@ -92,11 +59,71 @@ const getMyUpdatesByProject = async (req, res, next) => {
 };
 
 /**
- * GET single public update by slug + id
+ * GET /api/users/:username/projects/:slug/updates  (public, published only)
+ */
+const getUpdatesBySlug = async (req, res, next) => {
+  try {
+    const project = await updateService.findPublicProject(
+      req.params.username,
+      req.params.slug,
+    );
+
+    const { updates, pagination } = await updateService.getUpdatesByProject(
+      project,
+      { pagination: parsePagination(req.query) },
+    );
+
+    res.status(200).json({
+      success: true,
+      data: { updates, pagination },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/projects/:projectId/my-updates  (protected: project owner only,
+ * includes drafts)
+ */
+const getMyUpdatesByProject = async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.projectId);
+
+    // Same response for "missing" and "not yours", so other users' project
+    // ids reveal nothing.
+    if (!project || project.author.toString() !== req.user.id.toString()) {
+      return next(new AppError("This project could not be found.", 404));
+    }
+
+    const { updates, pagination } = await updateService.getUpdatesByProject(
+      project,
+      {
+        publishedOnly: false,
+        includeContent: true,
+        pagination: parsePagination(req.query),
+      },
+    );
+
+    res.status(200).json({
+      success: true,
+      data: { updates, pagination },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/users/:username/projects/:slug/updates/:updateId  (public)
  */
 const getUpdateBySlugAndId = async (req, res, next) => {
   try {
-    const update = await updateService.getUpdateById(req.params.updateId);
+    const update = await updateService.getPublicUpdate(
+      req.params.username,
+      req.params.slug,
+      req.params.updateId,
+    );
 
     res.status(200).json({
       success: true,
