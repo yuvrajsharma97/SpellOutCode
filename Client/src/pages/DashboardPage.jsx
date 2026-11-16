@@ -44,6 +44,12 @@ export default function DashboardPage() {
   );
   const activeProjects = projects.filter((p) => p.status === "active").length;
 
+  // Closing the modal (cross, Escape, backdrop, Cancel) discards what was typed.
+  const closeCreateProject = () => {
+    setCreateProjectOpen(false);
+    reset({});
+  };
+
   const onCreateProject = async (data) => {
     const payload = {
       ...data,
@@ -282,7 +288,7 @@ export default function DashboardPage() {
       {/* Create project modal */}
       <Modal
         isOpen={createProjectOpen}
-        onClose={() => setCreateProjectOpen(false)}
+        onClose={closeCreateProject}
         title="New project"
         width="520px">
         <form onSubmit={handleSubmit(onCreateProject)} noValidate>
@@ -360,7 +366,7 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "8px" }}>
-            <Button variant="ghost" onClick={() => setCreateProjectOpen(false)} type="button">
+            <Button variant="ghost" onClick={closeCreateProject} type="button">
               Cancel
             </Button>
             <Button type="submit" isLoading={isSubmitting}>

@@ -22,6 +22,12 @@ export default function ContactModal({
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(contactSchema) });
 
+  // Closing the modal (cross or Cancel) discards what was typed.
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
   const onSubmit = async (data) => {
     try {
       await contactApi.send(projectId, data);
@@ -39,7 +45,7 @@ export default function ContactModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={`Contact ${recipientName}`}
       width="460px"
       dismissible={false}>
@@ -89,7 +95,7 @@ export default function ContactModal({
             justifyContent: "flex-end",
             marginTop: "8px",
           }}>
-          <Button variant="ghost" onClick={onClose} type="button">
+          <Button variant="ghost" onClick={handleClose} type="button">
             Cancel
           </Button>
           <Button type="submit" isLoading={isSubmitting}>

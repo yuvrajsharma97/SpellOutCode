@@ -46,6 +46,13 @@ export default function DashboardProjectsPage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(projectSchema) });
 
+  // Closing the modal (cross, Escape, backdrop, Cancel) discards what was typed.
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingProject(null);
+    reset({});
+  };
+
   const openCreate = () => {
     setEditingProject(null);
     reset({});
@@ -320,7 +327,7 @@ export default function DashboardProjectsPage() {
       {/* Create / Edit Modal */}
       <Modal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         title={editingProject ? "Edit project" : "New project"}
         width="520px"
         dismissible={false}>
@@ -415,7 +422,7 @@ export default function DashboardProjectsPage() {
             }}>
             <Button
               variant="ghost"
-              onClick={() => setModalOpen(false)}
+              onClick={closeModal}
               type="button">
               Cancel
             </Button>

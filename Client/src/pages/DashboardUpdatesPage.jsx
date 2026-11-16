@@ -60,6 +60,13 @@ export default function DashboardUpdatesPage() {
     defaultValues: { title: "", summary: "", content: "", tag: "", published: false },
   });
 
+  // Closing the modal (cross, Escape, backdrop, Cancel) discards what was typed.
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingUpdate(null);
+    reset({ title: "", summary: "", content: "", tag: "", published: false });
+  };
+
   const openCreate = () => {
     setEditingUpdate(null);
     reset({ title: "", summary: "", content: "", tag: "", published: false });
@@ -304,7 +311,7 @@ export default function DashboardUpdatesPage() {
       {/* Create / Edit modal */}
       <Modal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         title={editingUpdate ? "Edit update" : "New update"}
         width="680px"
         dismissible={false}>
@@ -388,7 +395,7 @@ export default function DashboardUpdatesPage() {
             <div style={{ display: "flex", gap: "10px" }}>
               <Button
                 variant="ghost"
-                onClick={() => setModalOpen(false)}
+                onClick={closeModal}
                 type="button">
                 Cancel
               </Button>

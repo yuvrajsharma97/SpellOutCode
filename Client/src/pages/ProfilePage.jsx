@@ -1,231 +1,93 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useProfile } from "../hooks/useProfile";
 import { usePublicProjects } from "../hooks/useProjects";
 import { useDebounce } from "../hooks/useDebounce";
-import ProfileRail from "../components/profile/ProfileRail";
-import ProjectCard from "../components/project/ProjectCard";
-import SearchInput from "../components/ui/SearchInput";
-import EmptyState from "../components/ui/EmptyState";
-import { SkeletonCard } from "../components/ui/LoadingSkeleton";
-
-const STATUS_FILTERS = ["all", "active", "paused", "completed", "archived"];
+import ProfileHero from "../components/profile/ProfileHero";
+import ProfileIntro from "../components/profile/ProfileIntro";
+import ProjectShowcase from "../components/profile/ProjectShowcase";
+import FeaturedWork from "../components/profile/FeaturedWork";
+import BuildSteps from "../components/profile/BuildSteps";
+import { sectionShell } from "../components/profile/profileUtils";
 
 export default function ProfilePage() {
   const { username } = useParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const debouncedSearch = useDebounce(search, 250);
+  const projectsRef = useRef(null);
 
-  const {
-    data: profile,
-    isLoading: profileLoading,
-    isError: profileError,
-  } = useProfile(username);
-
-  const { data: projects = [], isLoading: projectsLoading } =
-    usePublicProjects(username);
+  const { data: profile, isLoading: profileLoading, isError: profileError } = useProfile(username);
+  const { data: projects = [], isLoading: projectsLoading } = usePublicProjects(username);
 
   if (profileError) {
     return (
       <div style={{ padding: "80px 32px", textAlign: "center" }}>
-        <p
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "13px",
-            color: "var(--ink-4)",
-          }}>
+        <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-4)" }}>
           Profile not found.
         </p>
       </div>
     );
   }
 
+  if (profileLoading || !profile) return <ProfileSkeleton />;
+
+  const query = debouncedSearch.trim().toLowerCase();
   const filtered = projects.filter((p) => {
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     const matchesSearch =
-      !debouncedSearch ||
-      p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      p.summary?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      p.techStack?.some((t) =>
-        t.toLowerCase().includes(debouncedSearch.toLowerCase()),
-      );
+      !query ||
+      p.title.toLowerCase().includes(query) ||
+      p.summary?.toLowerCase().includes(query) ||
+      p.techStack?.some((t) => t.toLowerCase().includes(query));
     return matchesStatus && matchesSearch;
   });
 
+  const seeProjects = () =>
+    projectsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 md:gap-16 px-4 py-8 sm:px-8 sm:py-10 md:py-12"
-      style={{
-        maxWidth: "960px",
-        margin: "0 auto",
-        minHeight: "calc(100vh - 52px)",
-      }}>
-      {/* Rail */}
-      {profileLoading ? (
-        <ProfileRailSkeleton />
-      ) : profile ? (
-        <ProfileRail profile={profile} />
-      ) : null}
-
-      {/* Main content */}
-      <main>
-        {/* Projects header */}
-        <div
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
-          style={{
-            marginBottom: "20px",
-            paddingBottom: "16px",
-            borderBottom: "1px solid var(--rule)",
-          }}>
-          <div className="flex items-center gap-4 min-w-0">
-            <span
-              className="flex-shrink-0"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "11px",
-                color: "var(--ink-4)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}>
-              Projects
-              {!projectsLoading && ` — ${projects.length}`}
-            </span>
-
-            {/* Status filter pills — horizontally scrollable so they never overflow the viewport */}
-            <div className="flex gap-1 overflow-x-auto">
-              {STATUS_FILTERS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatusFilter(s)}
-                  className="flex-shrink-0 whitespace-nowrap"
-                  style={{
-                    padding: "3px 10px",
-                    borderRadius: "2px",
-                    border: "1px solid",
-                    borderColor:
-                      statusFilter === s ? "var(--ink-4)" : "transparent",
-                    background:
-                      statusFilter === s ? "var(--paper-3)" : "transparent",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "10px",
-                    color: statusFilter === s ? "var(--ink)" : "var(--ink-4)",
-                    cursor: "pointer",
-                    letterSpacing: "0.03em",
-                    transition: "all var(--transition)",
-                  }}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full sm:w-[190px] flex-shrink-0">
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder="Search projects…"
-            />
-          </div>
-        </div>
-
-        {/* Project list */}
-        {projectsLoading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            title={
-              debouncedSearch || statusFilter !== "all"
-                ? "No projects match your filter."
-                : "No projects yet."
-            }
-            description={
-              debouncedSearch || statusFilter !== "all"
-                ? "Try adjusting your search or filter."
-                : `${profile?.name?.split(" ")[0] || "This user"} hasn't published any projects yet.`
-            }
-          />
-        ) : (
-          <div>
-            {filtered.map((project) => (
-              <ProjectCard
-                key={project._id}
-                project={project}
-                username={username}
-              />
-            ))}
-          </div>
-        )}
-      </main>
+    <div style={{ paddingBottom: "24px" }}>
+      <ProfileHero profile={profile} onSeeProjects={seeProjects} />
+      {!projectsLoading && <ProfileIntro profile={profile} projects={projects} />}
+      <div className={projectsLoading ? "pt-14 sm:pt-20" : ""}>
+        <ProjectShowcase
+          ref={projectsRef}
+          profile={profile}
+          projects={filtered}
+          isLoading={projectsLoading}
+          search={search}
+          onSearch={setSearch}
+          status={statusFilter}
+          onStatus={setStatusFilter}
+        />
+      </div>
+      {!projectsLoading && (
+        <>
+          <FeaturedWork profile={profile} projects={projects} onSeeProjects={seeProjects} />
+          <BuildSteps profile={profile} projects={projects} />
+        </>
+      )}
     </div>
   );
 }
 
-function ProfileRailSkeleton() {
+function ProfileSkeleton() {
   return (
-    <aside className="md:pr-10">
-      <div
-        className="skeleton"
-        style={{
-          width: "56px",
-          height: "56px",
-          borderRadius: "6px",
-          marginBottom: "18px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{
-          height: "18px",
-          width: "70%",
-          marginBottom: "8px",
-          borderRadius: "3px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{
-          height: "12px",
-          width: "50%",
-          marginBottom: "20px",
-          borderRadius: "3px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{
-          height: "12px",
-          width: "100%",
-          marginBottom: "6px",
-          borderRadius: "3px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{
-          height: "12px",
-          width: "85%",
-          marginBottom: "6px",
-          borderRadius: "3px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{
-          height: "12px",
-          width: "60%",
-          marginBottom: "28px",
-          borderRadius: "3px",
-        }}
-      />
-      <div
-        className="skeleton"
-        style={{ height: "34px", width: "100%", borderRadius: "4px" }}
-      />
-    </aside>
+    <div className={`${sectionShell} pt-4 sm:pt-6`}>
+      <div className="skeleton h-[380px] sm:h-[440px]" style={{ borderRadius: "20px" }} />
+      <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-10 py-14 md:px-8">
+        <div>
+          <div className="skeleton" style={{ height: "26px", width: "70%", borderRadius: "4px", marginBottom: "14px" }} />
+          <div className="skeleton" style={{ height: "12px", width: "90%", borderRadius: "3px", marginBottom: "8px" }} />
+          <div className="skeleton" style={{ height: "12px", width: "75%", borderRadius: "3px" }} />
+        </div>
+        <div className="flex flex-col gap-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="skeleton h-[92px]" style={{ borderRadius: "14px" }} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
