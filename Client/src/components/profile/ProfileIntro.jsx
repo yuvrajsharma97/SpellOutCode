@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
-import { ArrowUpRight, FolderGit2, PenLine, Zap, Hammer, Wrench, Flag } from "lucide-react";
-import { formatRelativeDate } from "../../utils/dates";
-import { firstName, socialLinks, byUpdatedDesc, sectionShell } from "./profileUtils";
+import { ArrowUpRight, FolderGit2, PenLine, Zap } from "lucide-react";
+import { socialLinks, sectionShell } from "./profileUtils";
 
 function Stat({ icon: Icon, value, label }) {
   return (
@@ -24,65 +22,15 @@ function Stat({ icon: Icon, value, label }) {
   );
 }
 
-function FeatureCard({ icon: Icon, title, children, to }) {
-  const body = (
-    <>
-      <span
-        className="flex-shrink-0 flex items-center justify-center"
-        style={{
-          width: "64px",
-          height: "64px",
-          borderRadius: "10px",
-          background: "var(--paper-2)",
-          color: "var(--ink-2)",
-        }}>
-        <Icon size={30} strokeWidth={1.6} />
-      </span>
-      <div className="min-w-0">
-        <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{title}</div>
-        <div style={{ fontSize: "12px", lineHeight: 1.55, fontWeight: 300, opacity: 0.85 }}>{children}</div>
-      </div>
-    </>
-  );
-  const style = {
-    display: "flex",
-    gap: "16px",
-    alignItems: "flex-start",
-    padding: "14px",
-    borderRadius: "14px",
-    background: "var(--ink-3)",
-    color: "var(--paper)",
-    textDecoration: "none",
-    transition: "background var(--transition)",
-  };
-  return to ? (
-    <Link
-      to={to}
-      style={style}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--ink-2)")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "var(--ink-3)")}>
-      {body}
-    </Link>
-  ) : (
-    <div style={style}>{body}</div>
-  );
-}
-
-/** "Why follow" block: bio, links and stats on the left, feature cards right. */
+/** "Why follow" block: intro text and links on the left, stats on the right. */
 export default function ProfileIntro({ profile, projects }) {
-  const name = firstName(profile.name) || profile.username;
   const links = socialLinks(profile);
   const totalUpdates = projects.reduce((sum, p) => sum + (p.updateCount || 0), 0);
   const active = projects.filter((p) => p.status === "active");
-  const building = [...active].sort(byUpdatedDesc)[0];
-  const shipped = projects.filter((p) => p.status === "completed").sort(byUpdatedDesc)[0];
-  const toolbox = profile.skills?.length
-    ? profile.skills
-    : [...new Set(projects.flatMap((p) => p.techStack || []))];
 
   return (
     <section className={`${sectionShell} py-14 sm:py-20`}>
-      <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-10 md:gap-14 md:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] md:items-center gap-10 md:gap-14 md:px-8">
         <div>
           <h2
             style={{
@@ -94,7 +42,7 @@ export default function ProfileIntro({ profile, projects }) {
               letterSpacing: "-0.01em",
               marginBottom: "14px",
             }}>
-            Why follow {name}'s work
+            Follow my work.
           </h2>
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ink-3)", fontWeight: 300, maxWidth: "520px" }}>
             Every project here is documented as it's built: the decisions, the dead ends and what
@@ -126,34 +74,12 @@ export default function ProfileIntro({ profile, projects }) {
               ))}
             </div>
           )}
-
-          <div className="grid grid-cols-3 gap-4 max-w-[420px]" style={{ marginTop: "44px" }}>
-            <Stat icon={FolderGit2} value={projects.length} label="Projects documented" />
-            <Stat icon={PenLine} value={totalUpdates} label="Progress updates" />
-            <Stat icon={Zap} value={active.length} label="Building right now" />
-          </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <FeatureCard
-            icon={Hammer}
-            title="Currently building"
-            to={building ? `/${profile.username}/projects/${building.slug}` : undefined}>
-            {building
-              ? `${building.title}, last updated ${formatRelativeDate(building.updatedAt)}.`
-              : "Nothing in progress right now. Check back soon."}
-          </FeatureCard>
-          <FeatureCard icon={Wrench} title="Toolbox">
-            {toolbox.length ? toolbox.slice(0, 8).join(", ") : "Skills haven't been added yet."}
-          </FeatureCard>
-          <FeatureCard
-            icon={Flag}
-            title="Latest shipped"
-            to={shipped ? `/${profile.username}/projects/${shipped.slug}` : undefined}>
-            {shipped
-              ? `${shipped.title}${shipped.summary ? `: ${shipped.summary}` : "."}`
-              : "No completed projects yet. The first one is on its way."}
-          </FeatureCard>
+        <div className="grid grid-cols-3 gap-4 w-full max-w-[420px] md:justify-self-end">
+          <Stat icon={FolderGit2} value={projects.length} label="Projects documented" />
+          <Stat icon={PenLine} value={totalUpdates} label="Progress updates" />
+          <Stat icon={Zap} value={active.length} label="Building right now" />
         </div>
       </div>
     </section>

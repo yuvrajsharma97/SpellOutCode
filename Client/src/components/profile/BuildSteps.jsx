@@ -1,9 +1,8 @@
-import { firstName, sectionShell } from "./profileUtils";
+import { sectionShell } from "./profileUtils";
 
-/** "How X builds, 1-2-3": the project lifecycle with real counts. */
-export default function BuildSteps({ profile, projects }) {
+/** "How it works, in step 1-2-3": the project lifecycle with real counts. */
+export default function BuildSteps({ projects }) {
   if (projects.length === 0) return null;
-  const name = firstName(profile.name) || profile.username;
   const count = (s) => projects.filter((p) => p.status === s).length;
   const updates = projects.reduce((sum, p) => sum + (p.updateCount || 0), 0);
 
@@ -14,7 +13,7 @@ export default function BuildSteps({ profile, projects }) {
   ];
 
   return (
-    <section className={`${sectionShell} py-14 sm:py-20`}>
+    <section className={`${sectionShell} pt-14 sm:pt-20`}>
       <div className="md:px-8">
         <h2
           style={{
@@ -24,7 +23,7 @@ export default function BuildSteps({ profile, projects }) {
             letterSpacing: "-0.01em",
             marginBottom: "28px",
           }}>
-          How {name} builds, in 1-2-3.
+          How it works, in step 1-2-3.
         </h2>
         <ol className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6" style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {steps.map((s, i) => (

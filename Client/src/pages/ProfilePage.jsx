@@ -47,9 +47,14 @@ export default function ProfilePage() {
     projectsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <div style={{ paddingBottom: "24px" }}>
+    <div className="pb-14 sm:pb-20">
       <ProfileHero profile={profile} onSeeProjects={seeProjects} />
-      {!projectsLoading && <ProfileIntro profile={profile} projects={projects} />}
+      {!projectsLoading && (
+        <>
+          <BuildSteps projects={projects} />
+          <ProfileIntro profile={profile} projects={projects} />
+        </>
+      )}
       <div className={projectsLoading ? "pt-14 sm:pt-20" : ""}>
         <ProjectShowcase
           ref={projectsRef}
@@ -63,10 +68,7 @@ export default function ProfilePage() {
         />
       </div>
       {!projectsLoading && (
-        <>
-          <FeaturedWork profile={profile} projects={projects} onSeeProjects={seeProjects} />
-          <BuildSteps profile={profile} projects={projects} />
-        </>
+        <FeaturedWork profile={profile} projects={projects} onSeeProjects={seeProjects} />
       )}
     </div>
   );
@@ -76,17 +78,16 @@ function ProfileSkeleton() {
   return (
     <div className={`${sectionShell} pt-4 sm:pt-6`}>
       <div className="skeleton h-[380px] sm:h-[440px]" style={{ borderRadius: "20px" }} />
-      <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-10 py-14 md:px-8">
-        <div>
-          <div className="skeleton" style={{ height: "26px", width: "70%", borderRadius: "4px", marginBottom: "14px" }} />
-          <div className="skeleton" style={{ height: "12px", width: "90%", borderRadius: "3px", marginBottom: "8px" }} />
-          <div className="skeleton" style={{ height: "12px", width: "75%", borderRadius: "3px" }} />
-        </div>
-        <div className="flex flex-col gap-4">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="skeleton h-[92px]" style={{ borderRadius: "14px" }} />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-14 md:px-8">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex gap-4">
+            <div className="skeleton flex-shrink-0" style={{ width: "40px", height: "40px", borderRadius: "999px" }} />
+            <div className="flex-1">
+              <div className="skeleton" style={{ height: "14px", width: "60%", borderRadius: "3px", marginBottom: "8px" }} />
+              <div className="skeleton" style={{ height: "12px", width: "90%", borderRadius: "3px" }} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

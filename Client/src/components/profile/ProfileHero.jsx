@@ -92,7 +92,7 @@ export default function ProfileHero({ profile, onSeeProjects }) {
             className="max-w-[520px]"
             style={{ marginTop: "18px", fontSize: "14px", lineHeight: 1.6, fontWeight: 300, opacity: 0.85 }}>
             {profile.roleTitle ? <strong style={{ fontWeight: 500 }}>{profile.roleTitle}. </strong> : null}
-            {profile.bio || `Follow ${firstName(profile.name) || profile.username}'s projects as they're built, one update at a time.`}
+            {profile.bio || `Follow projects as they're built, one update at a time.`}
           </p>
 
           <div className="flex flex-wrap gap-3" style={{ marginTop: "22px" }}>
